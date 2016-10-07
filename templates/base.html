@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}녹동현대병원 내시경실{% endblock %}</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/base.css" %}" >
+    <link rel="stylesheet" type="text/css" href="{% block extrastyle %}{% endblock %}" />
+
+</head>
+<body>
+
+<div id="header">
+    <h2 class="maintitle"><a href="#"> 내시경 통합 관리 시스템</a></h2>
+    <h4 class="welcome">Welcome, <a href="#"></a>/<a href="#">Change Password</a>/<a href="#">Logout</a> </h4>
+</div>
+<div id ="menu">
+    <li><a href="{% url 'procedure:add' %}"> 환자추가하기</a></li>
+    <li><a href="#" >통계</a></li>
+    <li><a href="{% url 'procedure:biopsy' %}">조직검사 입력</a></li>
+    <li><a href="{% url 'procedure:phone' %}">전화해주세요</a></li>
+    <li><a href="{% url 'procedure:search' %}"> 찾기</a></li>
+</div>
+{% block content %}{% endblock %}
+</body>
+</html>

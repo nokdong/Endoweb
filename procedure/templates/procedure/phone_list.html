@@ -1,0 +1,81 @@
+{%  extends "base.html" %}
+
+{% block title %}환자에게 전화해 주세요 {% endblock %}
+
+{% block content %}
+<div id="content">
+    <h1> 이번 달 검사 받으러 올 환자 명단 입니다.</h1>
+        <table>
+        <tr>
+        <th> 이름</th>
+        <th> 성별</th>
+        <th> No.</th>
+        <th> 생일</th>
+        <th> 전화</th>
+        <th> 검사 날짜</th>
+        <th> 검사종류</th>
+        <th> Dr.</th>
+        <th> 건진/진료</th>
+        <th> 검사 경로</th>
+        <th> 진단명</th>
+        <th> 시술</th>
+        <th> Bx </th>
+        </tr>
+    {% for list in object_list %}
+    {% if list.phone_check == '.' %}
+    <tr>
+        <th><a href="{% url 'procedure:phonecheck' list.id %}"><font color="blue">{{ list.patient_name }}</font></a></th>
+        <th>{{ list.patient_sex }}</th>
+        <th>{{ list.hospital_no}}</th>
+        <th>{{ list.patient_birth |  date:"Y, N d"}}</th>
+        <th>{{ list.patient_phone }}</th>
+        <th>{{ list.exam_date |  date:"Y, N d" }}</th>
+        <th>{{ list.exam_type }}</th>
+        <th>{{ list.exam_doc}}</th>
+        <th>{{ list.exam_class }}</th>
+        <th>{{ list.exam_place }}</th>
+        <th>{{ list.exam_Dx }}</th>
+        <th>{{ list.exam_procedure }}</th>
+        <th>{{ list.Bx_result }}</th>
+        </tr>
+    {% endif %}
+    {% endfor %}
+        </table>
+
+    <br><br><br>
+    <h1> 통화 결과 입니다.</h1>
+    <table>
+        <tr>
+        <th> 이름</th>
+        <th> 성별</th>
+        <th> No.</th>
+        <th> 생일</th>
+        <th> 전화</th>
+        <th> 검사 날짜</th>
+        <th> 검사종류</th>
+        <th> Dr.</th>
+        <th> 진단명</th>
+        <th> 시술</th>
+        <th> Bx </th>
+        <th> 통화내용</th>
+        </tr>
+    {% for list in object_list %}
+    {% if list.phone_check != '.' %}
+    <tr>
+        <th><a href="{% url 'procedure:phonecheck' list.id %}"><font color="blue">{{ list.patient_name }}</font></a></th>
+        <th>{{ list.patient_sex }}</th>
+        <th>{{ list.hospital_no}}</th>
+        <th>{{ list.patient_birth |  date:"Y, N d"}}</th>
+        <th>{{ list.patient_phone }}</th>
+        <th>{{ list.exam_date |  date:"Y, N d" }}</th>
+        <th>{{ list.exam_type }}</th>
+        <th>{{ list.exam_doc}}</th>
+        <th>{{ list.exam_Dx }}</th>
+        <th>{{ list.exam_procedure }}</th>
+        <th>{{ list.Bx_result }}</th>
+        <th><font color="red"><b>{{ list.phone_check }}</b></font></th>
+        </tr>
+    {% endif %}
+    {% endfor %}
+</div>
+{% endblock %}
