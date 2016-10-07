@@ -19,6 +19,6 @@ from procedure.views import HomeView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    #url(r'^$', HomeView.as_view(), name='home')
+    url(r'^$', HomeView.as_view(), name='home'),
     url(r'^procedure/', include('procedure.urls', namespace='procedure'))
 ]
