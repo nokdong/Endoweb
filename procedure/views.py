@@ -186,8 +186,12 @@ def thismonth(request):
     context['sig']=sig
     context['first_colon']=first_colon
     context['second_colon']=second_colon
-    context['first_adr']=int(float(first_adenoma)/first_colon *100)
-    context['second_adr'] = int(float(second_adenoma) / second_colon * 100)
+    if first_colon !=0:
+        context['first_adr']=int(float(first_adenoma)/first_colon *100)
+    else : context['first_adr']='None'
+    if second_colon !=0:
+        context['second_adr'] = int(float(second_adenoma) / second_colon * 100)
+    else : context['second_adr']='None'
 
     return render(request, 'procedure/this_month_list.html', context)
 
