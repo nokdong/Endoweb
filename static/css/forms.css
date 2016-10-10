@@ -14,16 +14,16 @@
 /* Authentication Forms*/
 
 fieldset{
-    border: 1px solid #00BFFF;
-    width: 600px;
+    border: 5px solid #00BFFF;
+    border-radius: 25px;
 
 }
 
 .aligned  {
-    width: 100%;
+    width: 600px;
     display: block;
     padding: 10px 10px 5 5;
-    float: left;
+    float: bottom;
 }
 
 .form-row {

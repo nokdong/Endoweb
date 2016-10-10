@@ -24,5 +24,7 @@ urlpatterns = [
     url(r'^(?P<pk>[0-9]+)/update/$', views.BxUpdateview.as_view(), name="update"),
     url(r'^phone/$', views.phone, name="phone"),
     url(r'^(?P<pk>[0-9]+)/phonecheck/$', views.PhoneCheck.as_view(), name="phonecheck"),
-    #url(r'^search_id/$', views.search_id, name="search_id"),
+    url(r'^today/$', views.today, name="today"),
+    url(r'^thismonth/$', views.thismonth, name="thismonth"),
+    url(r'^thisyear/$', views.graph, name="thisyear"),
 ]

@@ -78,6 +78,22 @@ div#menu >li {
     text-align: center;
     font-weight: bold;
     }
+div#menu li ul {
+    display: none;
+    position: absolute;
+    margin: 0px 0px 0px 90px;
+    padding: 10px 10px 5px 10px;
+    list-style: none;
+    border-right: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    background: white;
+    z-index: 1;
+}
+
+div#menu li:hover ul {
+    display: block;
+}
 
 /* LINK */
 a:link, a:visited {
@@ -92,12 +108,14 @@ text-decoration: underline;
 /* TABLE */
 table {
 border-collapse: collapse;
+text-align: center;
 }
 
 td, th {
 line-height: 18px;
 border-bottom: 1px solid #eee;
 vertical-align: top;
+
 padding : 5px 15px;
 font-family : "Lucida Grande", Verdana, Arial, sans-serif;
 }
@@ -112,4 +130,5 @@ font-family : "Lucida Grande", Verdana, Arial, sans-serif;
 .form-for li{
     float: left;
     padding-right: 50px;
+    display: inline;
 }
