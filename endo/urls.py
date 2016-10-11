@@ -15,10 +15,14 @@ Including another URLconf
 """
 from django.conf.urls import url,  include
 from django.contrib import admin
-from procedure.views import HomeView
+from procedure.views import HomeView, ExamCreateView
+from procedure.views import UserCreateView, UserCreateDoneTV
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', HomeView.as_view(), name='home'),
+    url(r'^accounts/', include('django.contrib.auth.urls')),
+    url(r'^accounts/register/$', UserCreateView.as_view(), name='register'),
+    url(r'^accounts/register/done/$',UserCreateDoneTV.as_view(), name='register_done'),
+    url(r'^$', ExamCreateView.as_view(), name='basic'),
     url(r'^procedure/', include('procedure.urls', namespace='procedure'))
 ]

@@ -5,13 +5,13 @@ from procedure.models import Exam
 from django import forms
 
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
+from django.contrib.auth.forms import UserCreationForm
+from django.core.urlresolvers import reverse_lazy
 
 from django.views.generic.edit import FormView
 from procedure.forms import ProcedureSearchForm
 from django.db.models import Q
 from django.shortcuts import render
-
-from django.core.urlresolvers import reverse_lazy
 
 from django.views.generic.base import TemplateView
 
@@ -20,6 +20,14 @@ from graphos.renderers.gchart import ColumnChart
 
 class HomeView(TemplateView):
     template_name="home.html"
+
+class UserCreateView(CreateView):
+    template_name='registration/register.html'
+    form_class = UserCreationForm
+    success_url = reverse_lazy('register_done')
+
+class UserCreateDoneTV(TemplateView):
+    template_name = 'registration/register_done.html'
 
 class ExamModelForm(forms.ModelForm):
     class Meta:
@@ -229,7 +237,16 @@ def year_data():
 def graph(request):
     data=year_data()
     data_source = SimpleDataSource(data=data)
-    print (data)
     chart = ColumnChart(data_source, options={'title': "올해 내시경 추이"})
     context = {'chart': chart}
     return render(request, 'procedure/year_graph.html', context)
+
+"""
+def graph(request):
+    data=year_data()
+    #data_source = SimpleDataSource(data=data)
+    print (data)
+    #chart = ColumnChart(data_source, options={'title': "올해 내시경 추이"})
+    context = {'data': data}
+    return render(request, 'procedure/year_graph.html', context)
+"""

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %} 로그인해 주세요 {% endblock %}
+
+{% load staticfiles %}
+{% block extrastyle %}{% static "css/forms.css" %}{% endblock %}
+
+{% block content %}
+<div id="content">
+    <h1> 로그인</h1>
+    <form action="." method="post">{% csrf_token %}
+    {% if form.errors %}
+        <p class="errornote"> 잘못 입력하였습니다.</p>
+    {% endif %}
+    <p> 아이디, 비번 입력해 주세요.</p>
+    <fieldset class ="aligned">
+        <div class="form-row">
+            {{form.username.label_tag }} {{form.username}}
+        </div>
+        <div class="form-row">
+            {{form.password.label_tag }} {{form.password}}
+        </div>
+    </fieldset>
+    <div class="submit-row">
+        <input type="submit" value="Log In"/>
+        <input type ="hidden" name="next" value=""{{next}}" />
+    </div>
+    <script type="text/javascript">document.getElementById('id_username').focus();</script>
+    </form>
+</div>
+{% endblock %}
