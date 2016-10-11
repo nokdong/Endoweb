@@ -16,7 +16,7 @@ from django.core.urlresolvers import reverse_lazy
 from django.views.generic.base import TemplateView
 
 from graphos.sources.simple import SimpleDataSource
-from graphos.renderers.gchart import LineChart
+from graphos.renderers.gchart import ColumnChart
 
 class HomeView(TemplateView):
     template_name="home.html"
@@ -204,7 +204,7 @@ def year_data():
     colon=0
     all_patients = Exam.objects.all()
     data=[
-        ['month','egd','colono'],
+        ['달','위내시경','대장내시경'],
     ]
 
     monthly_number={}
@@ -222,14 +222,14 @@ def year_data():
                     monthly_number[month][1] += 1
 
     for month in monthly_number:
-         data.append([month, monthly_number[month][0], monthly_number[month][1]])
+         data.append([str(month), monthly_number[month][0], monthly_number[month][1]])
     return data
 
 
 def graph(request):
     data=year_data()
+    data_source = SimpleDataSource(data=data)
     print (data)
-    chart = LineChart(SimpleDataSource(data=data))
-    print ('aaaa')
+    chart = ColumnChart(data_source, options={'title': "올해 내시경 추이"})
     context = {'chart': chart}
     return render(request, 'procedure/year_graph.html', context)
