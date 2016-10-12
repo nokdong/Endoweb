@@ -14,6 +14,8 @@ from django.db.models import Q
 from django.shortcuts import render
 
 from django.views.generic.base import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 
 from graphos.sources.simple import SimpleDataSource
 from graphos.renderers.gchart import ColumnChart
@@ -29,7 +31,7 @@ class UserCreateView(CreateView):
 class UserCreateDoneTV(TemplateView):
     template_name = 'registration/register_done.html'
 
-class ExamModelForm(forms.ModelForm):
+class ExamModelForm(LoginRequiredMixin, forms.ModelForm):
     class Meta:
         model=Exam
         fields=['exam_date','exam_type','exam_doc', 'exam_class', 'exam_place','patient_name','hospital_no','patient_sex','patient_birth',
@@ -37,7 +39,7 @@ class ExamModelForm(forms.ModelForm):
         widgets={'exam_type':forms.CheckboxSelectMultiple}
         widgets={'exam_procedure':forms.CheckboxSelectMultiple}
 
-class ExamCreateView(CreateView):
+class ExamCreateView(LoginRequiredMixin, CreateView):
     form_class = ExamModelForm
     model=Exam
     success_url = reverse_lazy("procedure:add")
@@ -46,7 +48,7 @@ class ExamCreateView(CreateView):
         return super(ExamCreateView, self).form_valid(form)
 
 
-class ProcedureFormView(FormView):
+class ProcedureFormView(LoginRequiredMixin, FormView):
     form_class = ProcedureSearchForm
     template_name='procedure/post_search.html'
 
@@ -64,13 +66,13 @@ class ProcedureFormView(FormView):
 
 
 
-class BxUpdateview(UpdateView):
+class BxUpdateview(LoginRequiredMixin, UpdateView):
     model=Exam
     fields = ['exam_date', 'exam_type', 'exam_doc', 'exam_class', 'exam_place', 'patient_name', 'hospital_no',
               'patient_sex', 'patient_birth','patient_phone','exam_Dx', 'exam_procedure','Bx_result','follow_up']
     success_url = reverse_lazy('procedure:biopsy')
 
-class BxListView(ListView):
+class BxListView(LoginRequiredMixin, ListView):
     template_name = 'procedure/Bx_list.html'
     context_object_name='object_list'
 
@@ -88,7 +90,7 @@ def add_month(date, months):
     new_date=date.replace(year=year, month=month, day=day)
     return new_date
 
-class PhoneListView(ListView):
+class PhoneListView(LoginRequiredMixin, ListView):
     template_name='procedure/phone_list.html'
     context_object_name = 'object_list'
 
@@ -97,6 +99,7 @@ class PhoneListView(ListView):
     def get_queryset(self):
         result=Exam.objects.filter(Q())
 
+@login_required
 def phone(request):
     today=date.today()
     all_patients=Exam.objects.all()
@@ -107,13 +110,14 @@ def phone(request):
             context['object_list'].append(patient)
     return render(request, 'procedure/phone_list.html', context)
 
-class PhoneCheck(UpdateView):
+class PhoneCheck(LoginRequiredMixin, UpdateView):
     model=Exam
     template_name = 'procedure/phone_check.html'
     fields = ['exam_date', 'exam_type', 'exam_doc', 'exam_class', 'exam_place', 'patient_name', 'hospital_no',
               'patient_sex', 'patient_birth','patient_phone','exam_Dx', 'exam_procedure','Bx_result','phone_check']
     success_url = reverse_lazy('procedure:phone')
 
+@login_required
 def today(request):
     today=date.today()
     g_egd = 0  # 건진위내시경
@@ -147,6 +151,7 @@ def today(request):
     context['sig']=sig
     return render(request, 'procedure/today_list.html', context)
 
+@login_required
 def thismonth(request):
     g_egd=0 #건진위내시경
     j_egd=0 #진료위내시경
@@ -233,7 +238,7 @@ def year_data():
          data.append([str(month), monthly_number[month][0], monthly_number[month][1]])
     return data
 
-
+@login_required
 def graph(request):
     data=year_data()
     data_source = SimpleDataSource(data=data)

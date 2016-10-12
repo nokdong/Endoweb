@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url,  include
 from django.contrib import admin
+from django.contrib.auth import login
 from procedure.views import HomeView, ExamCreateView
 from procedure.views import UserCreateView, UserCreateDoneTV
 
@@ -23,6 +24,7 @@ urlpatterns = [
     url(r'^accounts/', include('django.contrib.auth.urls')),
     url(r'^accounts/register/$', UserCreateView.as_view(), name='register'),
     url(r'^accounts/register/done/$',UserCreateDoneTV.as_view(), name='register_done'),
+    url(r'^accounts/login', login),
     url(r'^$', ExamCreateView.as_view(), name='basic'),
     url(r'^procedure/', include('procedure.urls', namespace='procedure'))
 ]
