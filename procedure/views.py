@@ -1,35 +1,23 @@
-import time
 from datetime import date
 
-from procedure.models import Exam
 from django import forms
-
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse_lazy
-
-from django.views.generic.edit import FormView
-from procedure.forms import ProcedureSearchForm
 from django.db.models import Q
 from django.shortcuts import render
-
+from django.views.generic import CreateView, ListView, UpdateView
 from django.views.generic.base import TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.decorators import login_required
-
-from graphos.sources.simple import SimpleDataSource
+from django.views.generic.edit import FormView
 from graphos.renderers.gchart import ColumnChart
+from graphos.sources.simple import SimpleDataSource
+
+from endo.views import LoginRequiredMixin
+from procedure.forms import ProcedureSearchForm
+from procedure.models import Exam
 
 class HomeView(TemplateView):
     template_name="home.html"
 
-class UserCreateView(CreateView):
-    template_name='registration/register.html'
-    form_class = UserCreationForm
-    success_url = reverse_lazy('register_done')
-
-class UserCreateDoneTV(TemplateView):
-    template_name = 'registration/register_done.html'
 
 class ExamModelForm(LoginRequiredMixin, forms.ModelForm):
     class Meta:
