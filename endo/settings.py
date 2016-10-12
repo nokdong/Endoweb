@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'procedure',
+    'procedure.apps.ProcedureConfig',
     'multiselectfield',
     'graphos',
 ]
@@ -129,4 +129,4 @@ MEDIA_ROOT=os.path.join(BASE_DIR, 'media')
 
 LOGIN_URL='/accounts/login'
 LOGOUT_URL='/accounts/logout/'
-LOGIN_REDIRECT_URL='/procedure'
+LOGIN_REDIRECT_URL='/'
