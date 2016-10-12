@@ -19,6 +19,7 @@ class Exam(models.Model):
     Bx_result=models.CharField("조직검사 결과", max_length=200, default=".")
     follow_up=models.IntegerField("추적검사 기간", default=0)
     phone_check=models.CharField("전화 통화 결과", max_length=50, default='.')
+    re_visit=models.BooleanField("재방문", default=False)
 
     class Meta:
         ordering=['-exam_date']

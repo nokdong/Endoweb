@@ -77,7 +77,7 @@ def add_month(date, months):
     day=date.day
     new_date=date.replace(year=year, month=month, day=day)
     return new_date
-
+"""
 class PhoneListView(LoginRequiredMixin, ListView):
     template_name='procedure/phone_list.html'
     context_object_name = 'object_list'
@@ -86,6 +86,7 @@ class PhoneListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         result=Exam.objects.filter(Q())
+"""
 
 @login_required
 def phone(request):
@@ -103,6 +104,13 @@ class PhoneCheck(LoginRequiredMixin, UpdateView):
     template_name = 'procedure/phone_check.html'
     fields = ['exam_date', 'exam_type', 'exam_doc', 'exam_class', 'exam_place', 'patient_name', 'hospital_no',
               'patient_sex', 'patient_birth','patient_phone','exam_Dx', 'exam_procedure','Bx_result','phone_check']
+    success_url = reverse_lazy('procedure:phone')
+
+class ReVisit(LoginRequiredMixin, UpdateView):
+    model=Exam
+    template_name = 'procedure/re_visit.html'
+    fields = ['exam_date', 'exam_type', 'exam_doc', 'exam_class', 'exam_place', 'patient_name', 'hospital_no',
+              'patient_sex', 'patient_birth','patient_phone','exam_Dx', 'exam_procedure','Bx_result','phone_check','re_visit']
     success_url = reverse_lazy('procedure:phone')
 
 @login_required
