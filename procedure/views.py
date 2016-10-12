@@ -92,11 +92,26 @@ class PhoneListView(LoginRequiredMixin, ListView):
 def phone(request):
     today=date.today()
     all_patients=Exam.objects.all()
-    context={'object_list':[]}
+
+    context={'phone_list':[], 'phoned_list':[], 'visited_list':[],  'total_number':0, 'will_phone_number':0, 'phoned_number':0, 'visited_number':0, 'phoned_fraction':0,"visited_fraction":0}
     for patient in all_patients:
         call_date=add_month(patient.exam_date, patient.follow_up)
-        if today.year==call_date.year and today.month==call_date.month:
-            context['object_list'].append(patient)
+        if today.year==call_date.year and today.month==call_date.month :
+            if patient.phone_check == '.':
+                context['phone_list'].append(patient)
+            elif patient.phone_check !='.':
+                if patient.re_visit == True:
+                    context['visited_list'].append(patient)
+                else :
+                    context['phoned_list'].append(patient)
+
+    context['will_phone_number']=len(context['phone_list'])
+    context['visited_number'] = len(context['visited_list'])
+    context['phoned_number']=len(context['phoned_list'])+context['visited_number']
+    context['total_number'] = context['will_phone_number'] + context['phoned_number']
+    context['phoned_fraction']=round(float(context['phoned_number'])/context['total_number']*100)
+    context['visited_fraction']=round(float(context['visited_number'])/context['total_number']*100)
+
     return render(request, 'procedure/phone_list.html', context)
 
 class PhoneCheck(LoginRequiredMixin, UpdateView):

@@ -4,7 +4,28 @@
 
 {% block content %}
 <div id="content">
-    <h1> 이번 달 검사 받으러 올 환자 명단 입니다.</h1>
+    <table border="5" >
+        <tr>
+            <th></th>
+            <th> 전화 대상자</th>
+            <th> 통화 된 사람</th>
+            <th> 재방문 한 사람</th>
+        </tr>
+        <tr>
+            <td> 명수</td>
+            <td> {{total_number}}</td>
+            <td> {{phoned_number}}</td>
+            <td> {{visited_number}}</td>
+        </tr>
+        <tr>
+            <td> % </td>
+            <td> </td>
+            <td> {{phoned_fraction}}</td>
+            <td> {{visited_fraction}}</td>
+        </tr>
+    </table>
+    <br><br><br>
+    <h1> 이번 달 검사 받으러 올 환자 <font color="red">{{total_number}}</font>명 중, 전화할 사람 <font color="red">{{will_phone_number}}</font>명 남았습니다.</h1>
         <table>
         <tr>
         <th> 이름</th>
@@ -21,8 +42,7 @@
         <th> 시술</th>
         <th> Bx </th>
         </tr>
-    {% for list in object_list %}
-    {% if list.phone_check == '.' %}
+    {% for list in phone_list %}
     <tr>
         <td><a href="{% url 'procedure:phonecheck' list.id %}"><font color="blue">{{ list.patient_name }}</font></a></td>
         <td>{{ list.patient_sex }}</td>
@@ -38,12 +58,11 @@
         <td>{{ list.exam_procedure }}</td>
         <td>{{ list.Bx_result }}</td>
         </tr>
-    {% endif %}
     {% endfor %}
         </table>
 
     <br><br><br>
-    <h1> 통화 결과 입니다.</h1>
+    <h1> <font color="red">{{phoned_number}}</font>명과 통화되었습니다. 아래는 통화 결과 입니다.</h1>
     <table>
         <tr>
         <th> 이름</th>
@@ -59,8 +78,7 @@
         <th> Bx </th>
         <th> 통화내용</th>
         </tr>
-    {% for list in object_list %}
-    {% if list.phone_check != '.' and list.re_visit == False%}
+    {% for list in phoned_list %}
     <tr>
         <td><a href="{% url 'procedure:revisit' list.id %}"><font color="blue">{{ list.patient_name }}</font></a></td>
         <td>{{ list.patient_sex }}</td>
@@ -75,11 +93,10 @@
         <td>{{ list.Bx_result }}</td>
         <td><font color="red"><b>{{ list.phone_check }}</b></font></td>
     </tr>
-    {% endif %}
     {% endfor %}
     </table>
     <br><br><br>
-    <h1> 통화 후 내원한 환자 입니다.</h1>
+    <h1> 통화 후 내원한 환자 <font color="red">{{visited_number}}</font>명 입니다.</h1>
     <table>
         <tr>
         <th> 이름</th>
@@ -95,8 +112,7 @@
         <th> Bx </th>
         <th> 통화내용</th>
         </tr>
-    {% for list in object_list %}
-    {% if list.re_visit == True %}
+    {% for list in visited_list %}
     <tr>
         <td><a href="{% url 'procedure:revisit' list.id %}"><font color="blue">{{ list.patient_name }}</font></a></td>
         <td>{{ list.patient_sex }}</td>
@@ -111,7 +127,6 @@
         <td>{{ list.Bx_result }}</td>
         <td><font color="red"><b>{{ list.phone_check }}</b></font></td>
     </tr>
-    {% endif %}
     {% endfor %}
     </table>
 </div>
