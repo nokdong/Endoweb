@@ -96,7 +96,7 @@ def phone(request):
     context={'phone_list':[], 'phoned_list':[], 'visited_list':[],  'total_number':0, 'will_phone_number':0, 'phoned_number':0, 'visited_number':0, 'phoned_fraction':0,"visited_fraction":0}
     for patient in all_patients:
         call_date=add_month(patient.exam_date, patient.follow_up)
-        if today.year==call_date.year and today.month==call_date.month and patient.exam_date.year !=today.year and patient.exam_date.month !=today.month:
+        if today.year==call_date.year and today.month==call_date.month :
             if patient.phone_check == '.':
                 context['phone_list'].append(patient)
             elif patient.phone_check !='.':
