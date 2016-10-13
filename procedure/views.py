@@ -97,13 +97,16 @@ def phone(request):
     for patient in all_patients:
         call_date=add_month(patient.exam_date, patient.follow_up)
         if today.year==call_date.year and today.month==call_date.month :
-            if patient.phone_check == '.':
-                context['phone_list'].append(patient)
-            elif patient.phone_check !='.':
-                if patient.re_visit == True:
-                    context['visited_list'].append(patient)
-                else :
-                    context['phoned_list'].append(patient)
+            if patient.exam_date.year == today.year and patient.exam_date.month == today.month:
+                continue;
+            else:
+                if patient.phone_check == '.':
+                    context['phone_list'].append(patient)
+                elif patient.phone_check !='.':
+                    if patient.re_visit == True:
+                        context['visited_list'].append(patient)
+                    else :
+                        context['phoned_list'].append(patient)
 
     context['will_phone_number']=len(context['phone_list'])
     context['visited_number'] = len(context['visited_list'])
