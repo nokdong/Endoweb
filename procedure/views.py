@@ -112,8 +112,11 @@ def phone(request):
     context['visited_number'] = len(context['visited_list'])
     context['phoned_number']=len(context['phoned_list'])+context['visited_number']
     context['total_number'] = context['will_phone_number'] + context['phoned_number']
-    context['phoned_fraction']=round(float(context['phoned_number'])/context['total_number']*100)
-    context['visited_fraction']=round(float(context['visited_number'])/context['total_number']*100)
+    if context['total_number'] ==0:
+        context['phoned_fraction'], context['visited_fraction'] = 0,0
+    else :
+        context['phoned_fraction']=round(float(context['phoned_number'])/context['total_number']*100)
+        context['visited_fraction']=round(float(context['visited_number'])/context['total_number']*100)
 
     return render(request, 'procedure/phone_list.html', context)
 
