@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="159160c9-d77f-4d14-806e-b0864d1b9b1b" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/db.sqlite3" afterPath="$PROJECT_DIR$/db.sqlite3" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/procedure/templates/procedure/phone_check.html" afterPath="$PROJECT_DIR$/procedure/templates/procedure/phone_check.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/procedure/templates/procedure/re_visit.html" afterPath="$PROJECT_DIR$/procedure/templates/procedure/re_visit.html" />
-    </list>
+    <list default="true" id="159160c9-d77f-4d14-806e-b0864d1b9b1b" name="Default" comment="" />
     <ignored path="nokdong.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path=".idea/dataSources.local.xml" />
