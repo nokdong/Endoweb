@@ -25,8 +25,8 @@
         <td><a href="{% url 'procedure:update' list.id %}"><font color="blue">{{ list.patient_name }}</font></a></td>
         <td>{{ list.patient_sex }}</td>
         <td>{{ list.hospital_no}}</td>
-        <td>{{ list.patient_birth |  date:"Y, N d"}}</td>
-        <td>{{ list.exam_date |  date:"Y, N d" }}</td>
+        <td>{{ list.patient_birth |  date:"y, m.d"}}</td>
+        <td>{{ list.exam_date |  date:"y, m.d" }}</td>
         <td>{{ list.exam_type }}</td>
         <td>{{ list.exam_doc}}</td>
         <td>{{ list.exam_class }}</td>
