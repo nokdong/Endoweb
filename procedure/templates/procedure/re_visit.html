@@ -8,12 +8,15 @@
 
 {% block content %}
 <div id="content">
-<h1> 전화 상담 결과 입력해 주세요</h1>
+<h1> '재방문'란에 체크해주세요</h1>
 
 <form action="." method="post"> {% csrf_token %}
     {% if form.errors %}
     <p class="errornote"> 입력이 잘못 되었습니다. 다시 입력해주세요!~</p>
     {% endif %}
+    <div class="submit-row">
+        <input type="submit" value="저장"/>
+    </div>
 
     <fieldset class="aligned">
         <div class="form-row">
@@ -65,10 +68,6 @@
             {{form.follow_up.label_tag}}{{form.follow_up}}
         </div>
     </fieldset>
-    <div class="submit-row">
-        <input type="submit" value="저장"/>
-    </div>
-
     </form>
 </div>
 {% endblock %}
