@@ -70,6 +70,20 @@ class BxListView(LoginRequiredMixin, ListView):
                                    Q(exam_procedure__icontains='EMR')).distinct()
         return result
 
+class ReadingUpdateview(LoginRequiredMixin, UpdateView):
+    model=Exam
+    fields = ['exam_date', 'exam_type', 'exam_doc', 'exam_class', 'exam_place', 'patient_name', 'hospital_no',
+              'patient_sex', 'patient_birth','patient_phone','exam_Dx', 'exam_procedure','Bx_result','follow_up']
+    success_url = reverse_lazy('procedure:reading')
+
+class ReadingListView(LoginRequiredMixin, ListView):
+    template_name = 'procedure/reading_list.html'
+    context_object_name='object_list'
+
+    def get_queryset(self):
+        result=Exam.objects.filter(Q(exam_Dx__icontains='.')).distinct()
+        return result
+
 def add_month(date, months):
     month=date.month + int(months)-1
     year=int(date.year + (month/12))
@@ -263,12 +277,4 @@ def graph(request):
     context = {'chart': chart}
     return render(request, 'procedure/year_graph.html', context)
 
-"""
-def graph(request):
-    data=year_data()
-    #data_source = SimpleDataSource(data=data)
-    print (data)
-    #chart = ColumnChart(data_source, options={'title': "올해 내시경 추이"})
-    context = {'data': data}
-    return render(request, 'procedure/year_graph.html', context)
-"""
+
