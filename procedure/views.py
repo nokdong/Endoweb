@@ -81,7 +81,7 @@ class ReadingListView(LoginRequiredMixin, ListView):
     context_object_name='object_list'
 
     def get_queryset(self):
-        result=Exam.objects.filter(Q(exam_Dx__icontains='.')).distinct()
+        result=Exam.objects.filter(exam_Dx ='.')
         return result
 
 def add_month(date, months):
