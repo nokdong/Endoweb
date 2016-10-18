@@ -7,7 +7,7 @@ class Exam(models.Model):
     exam_date=models.DateField('검사 날짜', default=date.today)
     exam_type=MultiSelectField('내시경 종류', max_length=20, max_choices=3,choices=(('E', 'EGD'),('C','Colonoscopy'), ('S','Sigmoidoscopy')))
     exam_doc=models.CharField('의사', max_length=30, choices=(('이영재','이영재'),('김신일','김신일')), default='김신일')
-    exam_class=models.CharField('건진/진료',max_length=30, choices=(('건진',"건진"),('진료',"진료")), default='건진')
+    exam_class=models.CharField('건진/진료',max_length=30, choices=(('건진',"건진"),('진료',"진료"),('건진+진료',"건진+진료")), default='건진')
     exam_place=models.CharField('외래/입원', max_length=20, choices=(('입원', '입원'), ('외래', '외래')), default='외래')
     patient_name=models.CharField('환자 이름', max_length=50)
     hospital_no=models.CharField('환자등록 번호', max_length=10)

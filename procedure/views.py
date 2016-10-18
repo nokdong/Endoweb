@@ -206,6 +206,9 @@ def thismonth(request):
                     g_egd+=1
                 elif patient.exam_class=="진료":
                     j_egd+=1
+                elif patient.exam_class == "건진+진료":
+                    g_egd+=1
+
             if 'C' in patient.exam_type:
                 if patient.exam_doc=="이영재":
                     first_colon+=1
@@ -216,6 +219,9 @@ def thismonth(request):
                     g_colon+=1
                 elif patient.exam_class=="진료":
                     j_colon+=1
+                elif patient.exam_class=="건진+진료":
+                    j_colon+=1
+
             if 'S' in patient.exam_type : sig+=1
             if patient.exam_doc=="이영재" and 'adenoma' in patient.Bx_result:
                 first_adenoma+=1
