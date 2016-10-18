@@ -81,7 +81,7 @@ div#menu >li {
 div#menu li ul {
     display: none;
     position: absolute;
-    margin: 0px 0px 0px 90px;
+    margin: 0px 0px 0px 60px;
     padding: 10px 10px 5px 10px;
     list-style: none;
     border-right: 1px solid #ccc;
