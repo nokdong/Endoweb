@@ -191,13 +191,13 @@ def thismonth(request):
     sig=0
     first_colon=0
     second_colon=0
-    first_adenoma=0
-    second_adenoma=0
+    first_polyp=0
+    second_polyp=0
     today=date.today()
     this_month=today.month
     this_year=today.year
     all_patients=Exam.objects.all()
-    context={'object_list':[],'g_egd':0, 'j_egd':0, 'total_egd':0, 'g_colon':0, 'j_colon':0, 'total_colon':0, 'sig':0, 'first_colon':0, 'first_adr':0, 'second_colon':0, 'second_adr':0}
+    context={'object_list':[],'g_egd':0, 'j_egd':0, 'total_egd':0, 'g_colon':0, 'j_colon':0, 'total_colon':0, 'sig':0, 'first_colon':0, 'first_polyp_rate':0, 'second_colon':0, 'second_polyp_rate':0}
     for patient in all_patients:
         if patient.exam_date.year==this_year and patient.exam_date.month==this_month:
             context['object_list'].append(patient)
@@ -212,8 +212,12 @@ def thismonth(request):
             if 'C' in patient.exam_type:
                 if patient.exam_doc=="이영재":
                     first_colon+=1
+                    if 'Polypectomy' in patient.exam_procedure or 'EMR' in patient.exam_procedure:
+                        first_polyp+=1
                 elif patient.exam_doc=="김신일":
                     second_colon+=1
+                    if 'Polypectomy' in patient.exam_procedure or 'EMR' in patient.exam_procedure:
+                        second_polyp+=1
 
                 if patient.exam_class=="건진":
                     g_colon+=1
@@ -222,11 +226,10 @@ def thismonth(request):
                 elif patient.exam_class=="건진+진료":
                     j_colon+=1
 
+
+
             if 'S' in patient.exam_type : sig+=1
-            if patient.exam_doc=="이영재" and 'adenoma' in patient.Bx_result:
-                first_adenoma+=1
-            if patient.exam_doc=="김신일" and 'adenoma' in patient.Bx_result:
-                second_adenoma+=1
+
     context['g_egd']=g_egd
     context['j_egd'] = j_egd
     context['total_egd']=g_egd+j_egd
@@ -237,11 +240,11 @@ def thismonth(request):
     context['first_colon']=first_colon
     context['second_colon']=second_colon
     if first_colon !=0:
-        context['first_adr']=int(float(first_adenoma)/first_colon *100)
-    else : context['first_adr']='None'
+        context['first_polyp_rate']=int(float(first_polyp)/first_colon *100)
+    else : context['first_polyp_rate']='None'
     if second_colon !=0:
-        context['second_adr'] = int(float(second_adenoma) / second_colon * 100)
-    else : context['second_adr']='None'
+        context['second_polyp_rate'] = int(float(second_polyp) / second_colon * 100)
+    else : context['second_polyp_rate']='None'
 
     return render(request, 'procedure/this_month_list.html', context)
 
