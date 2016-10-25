@@ -15,6 +15,7 @@ from endo.views import LoginRequiredMixin
 from procedure.forms import ProcedureSearchForm
 from procedure.models import Exam
 
+
 class HomeView(TemplateView):
     template_name="home.html"
 
@@ -60,6 +61,18 @@ class BxUpdateview(LoginRequiredMixin, UpdateView):
               'patient_sex', 'patient_birth','patient_phone','exam_Dx', 'exam_procedure','Bx_result','follow_up']
     success_url = reverse_lazy('procedure:biopsy')
 
+class TodayUpdateview(LoginRequiredMixin, UpdateView):
+    model=Exam
+    fields = ['exam_date', 'exam_type', 'exam_doc', 'exam_class', 'exam_place', 'patient_name', 'hospital_no',
+              'patient_sex', 'patient_birth','patient_phone','exam_Dx', 'exam_procedure','Bx_result','follow_up']
+    success_url = reverse_lazy('procedure:today')
+
+class MonthUpdateview(LoginRequiredMixin, UpdateView):
+    model=Exam
+    fields = ['exam_date', 'exam_type', 'exam_doc', 'exam_class', 'exam_place', 'patient_name', 'hospital_no',
+              'patient_sex', 'patient_birth','patient_phone','exam_Dx', 'exam_procedure','Bx_result','follow_up']
+    success_url = reverse_lazy('procedure:thismonth')
+
 class BxListView(LoginRequiredMixin, ListView):
     template_name = 'procedure/Bx_list.html'
     context_object_name='object_list'
@@ -97,6 +110,7 @@ def add_month(date, months):
 def phone(request):
     today=date.today()
     all_patients=Exam.objects.all()
+    print (all_patients)
 
     context={'phone_list':[], 'phoned_list':[], 'visited_list':[],  'total_number':0, 'will_phone_number':0, 'phoned_number':0, 'visited_number':0, 'phoned_fraction':0,"visited_fraction":0}
     for patient in all_patients:
@@ -129,7 +143,7 @@ class PhoneCheck(LoginRequiredMixin, UpdateView):
     model=Exam
     template_name = 'procedure/phone_check.html'
     fields = ['exam_date', 'exam_type', 'exam_doc', 'exam_class', 'exam_place', 'patient_name', 'hospital_no',
-              'patient_sex', 'patient_birth','patient_phone','exam_Dx', 'exam_procedure','Bx_result','phone_check']
+              'patient_sex', 'patient_birth','patient_phone','exam_Dx', 'exam_procedure','Bx_result','phone_check', 'follow_up']
     success_url = reverse_lazy('procedure:phone')
 
 class ReVisit(LoginRequiredMixin, UpdateView):
