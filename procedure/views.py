@@ -102,7 +102,7 @@ def add_month(date, months):
     year=int(date.year + (month/12))
     month=(month%12)+1
     day=date.day
-    new_date=date.replace(year=year, month=month, day=day)
+    new_date=date.replace(year=year, month=month, day=1)
     return new_date
 
 
