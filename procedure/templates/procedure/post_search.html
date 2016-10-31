@@ -30,11 +30,13 @@
         <th> 시술</th>
         <th> 조직 소견</th>
         <th> F/U</th>
+        <th> 전화여부</th>
+        <th> 재방문</th>
         </tr>
 
     {%  for list in object_list %}
         <tr>
-        <td><a href="{% url 'procedure:search' list.id %}"><font color="blue">{{ list.patient_name }}</font></a></td>
+        <td><a href="{% url 'procedure:search_update' list.id %}"><font color="blue">{{ list.patient_name }}</font></a></td>
         <td>{{ list.patient_sex }}</td>
         <td>{{ list.hospital_no}}</td>
         <td>{{ list.patient_birth |  date:"y, m.d"}}</td>
@@ -48,6 +50,8 @@
         <td>{{ list.exam_procedure }}</td>
         <td>{{ list.Bx_result }}</td>
         <td>{{ list.follow_up }}</td>
+        <td>{{ list.phone_check }}</td>
+        <td>{{ list.re_visit }}</td>
         </tr>
     {% endfor %}
         </table>

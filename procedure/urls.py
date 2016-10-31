@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^(?P<pk>[0-9]+)/readingupdate/$', views.ReadingUpdateview.as_view(), name="readingupdate"),
     url(r'^biopsy/$', views.BxListView.as_view(), name="biopsy"),
     url(r'^(?P<pk>[0-9]+)/update/$', views.BxUpdateview.as_view(), name="update"),
+    url(r'^(?P<pk>[0-9]+)/search_update/$', views.SearchUpdateview.as_view(), name="search_update"),
     url(r'^(?P<pk>[0-9]+)/today_update/$', views.TodayUpdateview.as_view(), name="today_update"),
     url(r'^(?P<pk>[0-9]+)/month_update/$', views.MonthUpdateview.as_view(), name="month_update"),
     url(r'^phone/$', views.phone, name="phone"),
