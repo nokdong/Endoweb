@@ -66,6 +66,7 @@ class SearchUpdateview(LoginRequiredMixin, UpdateView):
     fields = ['exam_date', 'exam_type', 'exam_doc', 'exam_class', 'exam_place', 'patient_name', 'hospital_no',
               'patient_sex', 'patient_birth','patient_phone','exam_Dx', 'exam_procedure','Bx_result','follow_up',
               'phone_check','re_visit']
+    template_name = 'procedure/post_search_update.html'
     success_url = reverse_lazy('procedure:search')
 
 class TodayUpdateview(LoginRequiredMixin, UpdateView):
