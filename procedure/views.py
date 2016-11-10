@@ -293,7 +293,7 @@ def year_data():
             if patient_year==today_year and patient_month==month:
                 if 'E' in patient.exam_type:
                     monthly_number[month][0]+=1
-                if 'C' in patient.exam_type:
+                if 'C' in patient.exam_type or 'S' in patient.exam_type:
                     monthly_number[month][1] += 1
 
     for month in monthly_number:
