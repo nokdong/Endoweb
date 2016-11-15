@@ -32,5 +32,6 @@ urlpatterns = [
     url(r'^today/$', views.today, name="today"),
     url(r'^thismonth/$', views.thismonth, name="thismonth"),
     url(r'^thisyear/$', views.graph, name="thisyear"),
+    url(r'^homethisyear/$', views.homegraph, name="homethisyear"),
     url(r'^(?P<pk>[0-9]+)/revisit/$', views.ReVisit.as_view(), name='revisit'),
 ]

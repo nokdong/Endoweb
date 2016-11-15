@@ -118,7 +118,6 @@ def add_month(date, months):
 def phone(request):
     today=date.today()
     all_patients=Exam.objects.all()
-    print (all_patients)
 
     context={'phone_list':[], 'phoned_list':[], 'visited_list':[],  'total_number':0, 'will_phone_number':0, 'phoned_number':0, 'visited_number':0, 'phoned_fraction':0,"visited_fraction":0}
     for patient in all_patients:
@@ -180,10 +179,14 @@ def today(request):
                     g_egd+=1
                 elif patient.exam_class=="진료":
                     j_egd+=1
+                elif patient.exam_class == "건진+진료":
+                    g_egd+=1
             if 'C' in patient.exam_type:
                 if patient.exam_class=="건진":
                     g_colon+=1
                 elif patient.exam_class=="진료":
+                    j_colon+=1
+                elif patient.exam_class == "건진+진료":
                     j_colon+=1
             if 'S' in patient.exam_type : sig+=1
     context['g_egd'] = g_egd
@@ -230,7 +233,7 @@ def thismonth(request):
                     first_colon+=1
                     if 'Polypectomy' in patient.exam_procedure or 'EMR' in patient.exam_procedure:
                         first_polyp+=1
-                    if 'adenoa' in patient.Bx_result:
+                    if 'adenoma' in patient.Bx_result:
                         first_adenoma+=1
                 elif patient.exam_doc=="김신일":
                     second_colon+=1
@@ -307,5 +310,147 @@ def graph(request):
     chart = ColumnChart(data_source, options={'title': "올해 내시경 추이"})
     context = {'chart': chart}
     return render(request, 'procedure/year_graph.html', context)
+
+def homegraph(request):
+    data=year_data()
+    data_source = SimpleDataSource(data=data)
+    chart = ColumnChart(data_source, options={'title': "올해 내시경 추이"})
+    context = {'chart': chart}
+    return render(request, 'procedure/home_year_graph.html', context)
+
+def home(request):
+    none_Bx = 0  # Bx 결과 안들어 간 사람
+    none_reading = 0  # 판독 안들어 간 사람
+    will_phone = 0  # 전화해야할 사람
+
+    today_g_egd, today_j_egd=0,0
+    today_g_colon, today_j_colon=0,0
+    today_sig=0
+
+    month_g_egd, month_j_egd, month_total_egd = 0,0,0  # 이번달 건진위내시경, 진료위내시경
+    month_g_colon, month_j_colon, month_total_colon = 0,0,0  # 이번달 건진대장내시경, 진료대장내시경
+    month_sig = 0 # 이번달 직장내시경
+
+    first_colon = 0 # 1내과대장
+    second_colon = 0 # 2내과대장
+    first_polyp = 0 # 1내과용종
+    second_polyp = 0 # 2내과 용종
+    first_adenoma = 0 #1내과 선종
+    second_adenoma = 0 #2내과 선종
+    first_polyp_rate=0
+    second_polyp_rate=0
+    first_adenoma_rate=0
+    second_adenoma_rate=0
+
+
+    today = date.today()
+    this_month = today.month
+    this_year = today.year
+
+    all_patients = Exam.objects.all()
+    context = {'none_Bx': 0, 'none_reading': 0, 'will_phone': 0,
+               'today_g_egd': today_g_egd, 'today_j_egd': today_j_egd,
+               'today_g_colon': today_g_colon, 'today_j_colon': today_j_colon, 'today_sig': 0,
+               'today_total_egd':0, 'today_total_colon':0,
+               'month_g_egd': month_g_egd, 'month_j_egd': month_j_egd,
+               'month_g_colon': month_g_colon, 'month_j_colon': month_j_colon, 'month_sig': 0,
+               'month_total_egd':month_total_egd,
+               'month_total_colon': month_total_colon,
+               'first_colon': first_colon, 'second_colon': second_colon,
+               'first_polyp_rate': first_polyp_rate, 'second_polyp_rate': second_polyp_rate,
+               'first_adenoma_rate': first_adenoma_rate, 'second_adenoma_rate': second_adenoma_rate}
+
+    for patient in all_patients:
+        if patient.exam_procedure in [['EMR'],['Polypectomy'], ['Bx']] and patient.Bx_result=='.':
+            none_Bx+=1
+    context['none_Bx']=none_Bx
+
+    for patient in all_patients:
+        if patient.exam_Dx=='.': none_reading+=1
+    context['none_reading']=none_reading
+
+    for patient in all_patients:
+        call_date=add_month(patient.exam_date, patient.follow_up)
+        if today.year==call_date.year and today.month==call_date.month:
+            if patient.exam_date.year==today.year and patient.exam_date.month==today.month:
+                continue;
+            else :
+                if patient.phone_check=='.' : will_phone+=1
+    context['will_phone']=will_phone
+
+    for patient in all_patients:
+        if patient.exam_date == today:
+            if 'E' in patient.exam_type:
+                if patient.exam_class == '건진':
+                    today_g_egd += 1
+                elif patient.exam_class == "진료":
+                    today_j_egd += 1
+            if 'C' in patient.exam_type:
+                if patient.exam_class == "건진":
+                    today_g_colon += 1
+                elif patient.exam_class == "진료":
+                    today_j_colon += 1
+            if 'S' in patient.exam_type: today_sig += 1
+    context['today_g_egd'], context['today_j_egd'], context['today_g_colon'], context['today_j_colon']=today_g_egd, today_j_egd, today_g_colon, today_j_colon
+    context['today_sig']=today_sig
+    context['today_total_egd']=today_g_egd+today_j_egd
+    context['today_total_colon']=today_g_colon+today_j_colon
+
+    for patient in all_patients:
+        if patient.exam_date.year == this_year and patient.exam_date.month == this_month:
+            if 'E' in patient.exam_type:
+                if patient.exam_class == '건진':
+                    month_g_egd += 1
+                elif patient.exam_class == "진료":
+                    month_j_egd += 1
+                elif patient.exam_class == "건진+진료":
+                    month_g_egd += 1
+
+            if 'C' in patient.exam_type:
+                if patient.exam_doc == "이영재":
+                    first_colon += 1
+                    if 'Polypectomy' in patient.exam_procedure or 'EMR' in patient.exam_procedure:
+                        first_polyp += 1
+                    if 'adenoma' in patient.Bx_result:
+                        first_adenoma += 1
+                elif patient.exam_doc == "김신일":
+                    second_colon += 1
+                    if 'Polypectomy' in patient.exam_procedure or 'EMR' in patient.exam_procedure:
+                        second_polyp += 1
+                    if 'adenoma' in patient.Bx_result:
+                        second_adenoma += 1
+
+                if patient.exam_class == "건진":
+                    month_g_colon += 1
+                elif patient.exam_class == "진료":
+                    month_j_colon += 1
+                elif patient.exam_class == "건진+진료":
+                    month_j_colon += 1
+
+            if 'S' in patient.exam_type: month_sig += 1
+
+    context['month_g_egd'] = month_g_egd
+    context['month_j_egd'] = month_j_egd
+    context['month_total_egd'] = month_g_egd + month_j_egd
+    context['month_g_colon'] = month_g_colon
+    context['month_j_colon'] = month_j_colon
+    context['month_total_colon'] = month_g_colon + month_j_colon
+    context['month_sig'] = month_sig
+    context['first_colon'] = first_colon
+    context['second_colon'] = second_colon
+    if first_colon != 0:
+        context['first_polyp_rate'] = int(float(first_polyp) / first_colon * 100)
+        context['first_adr'] = int(float(first_adenoma) / first_colon * 100)
+    else:
+        context['first_polyp_rate'] = 'None'
+    if second_colon != 0:
+        context['second_polyp_rate'] = int(float(second_polyp) / second_colon * 100)
+        context['second_adr'] = int(float(second_adenoma) / second_colon * 100)
+    else:
+        context['second_polyp_rate'] = 'None'
+
+    return render(request, 'home.html', context)
+
+
 
 

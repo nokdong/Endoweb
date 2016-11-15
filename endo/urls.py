@@ -21,6 +21,7 @@ from django.conf import settings
 from django.contrib.auth import views as auth_views
 from procedure.views import HomeView, ExamCreateView
 from endo.views import UserCreateView, UserCreateDoneTV, HomeView
+from procedure import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -28,6 +29,6 @@ urlpatterns = [
     url(r'^accounts/register/$', UserCreateView.as_view(), name='register'),
     url(r'^accounts/register/done/$',UserCreateDoneTV.as_view(), name='register_done'),
     #url(r'^accounts/login', auth_views.login),
-    url(r'^$', HomeView.as_view(), name='home'),
+    url(r'^$', views.home, name='home'),
     url(r'^procedure/', include('procedure.urls', namespace='procedure'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
