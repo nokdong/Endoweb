@@ -89,25 +89,29 @@
             <th> </th>
             <th> 이영재</th>
             <th> 김신일</th>
+            <th> 병원 전체</th>
         </tr>
         <tr>
             <td> <strong>대장내시경</strong></td>
             <td> {{first_colon}}개</td>
             <td> {{second_colon}}개</td>
+            <td> {{month_total_colon}} 개</td>
         </tr>
         <tr>
             <td> <strong>용종발견율</strong></td>
             <td> {{first_polyp_rate}}%</td>
             <td> {{second_polyp_rate}}%</td>
+            <td> {{total_polyp_rate}}%</td>
         </tr>
         <tr>
             <td> <strong>선종발견율</strong></td>
             <td> {{first_adr}}%</td>
             <td> {{second_adr}}%</td>
+            <td> {{total_adenoma_rate}}%</td>
         </tr>
     </table>
     </div>
-    <div id ="low"><iframe src="/procedure/homethisyear" width="100%" height="300"></iframe>
+    <div id ="low"><iframe src="/procedure/homethisyear" width="100%" height="400"></iframe>
     </div>
 
 {% endblock %}

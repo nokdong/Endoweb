@@ -216,7 +216,8 @@ def thismonth(request):
     this_year=today.year
     all_patients=Exam.objects.all()
     context={'object_list':[],'g_egd':0, 'j_egd':0, 'total_egd':0, 'g_colon':0, 'j_colon':0, 'total_colon':0, 'sig':0, 'first_colon':0,
-             'first_polyp_rate':0, 'first_adr':0, 'second_colon':0, 'second_polyp_rate':0, 'second_adr':0}
+             'first_polyp_rate':0, 'first_adr':0, 'second_colon':0, 'second_polyp_rate':0, 'second_adr':0,
+             'total_polyp_rate':0, 'total_adenoma_rate':0}
     for patient in all_patients:
         if patient.exam_date.year==this_year and patient.exam_date.month==this_month:
             context['object_list'].append(patient)
@@ -270,6 +271,9 @@ def thismonth(request):
         context['second_polyp_rate'] = int(float(second_polyp) / second_colon * 100)
         context['second_adr'] = int(float(second_adenoma) / second_colon * 100)
     else : context['second_polyp_rate']='None'
+
+    context['total_polyp_rate'] = int(float(first_polyp + second_polyp) / context['total_colon'] * 100)
+    context['total_adenoma_rate'] = int(float(first_adenoma + second_adenoma) / context['total_colon'] * 100)
 
     return render(request, 'procedure/this_month_list.html', context)
 
@@ -341,6 +345,7 @@ def home(request):
     second_polyp_rate=0
     first_adenoma_rate=0
     second_adenoma_rate=0
+    total_polyp_rate, total_adenoma_rate=0,0
 
 
     today = date.today()
@@ -358,7 +363,8 @@ def home(request):
                'month_total_colon': month_total_colon,
                'first_colon': first_colon, 'second_colon': second_colon,
                'first_polyp_rate': first_polyp_rate, 'second_polyp_rate': second_polyp_rate,
-               'first_adenoma_rate': first_adenoma_rate, 'second_adenoma_rate': second_adenoma_rate}
+               'first_adenoma_rate': first_adenoma_rate, 'second_adenoma_rate': second_adenoma_rate,
+               'total_polyp_rate': total_polyp_rate, 'total_adenoma_rate': total_adenoma_rate}
 
     for patient in all_patients:
         if patient.exam_procedure in [['EMR'],['Polypectomy'], ['Bx']] and patient.Bx_result=='.':
@@ -385,10 +391,14 @@ def home(request):
                     today_g_egd += 1
                 elif patient.exam_class == "진료":
                     today_j_egd += 1
+                elif patient.exam_class == "건진+진료":
+                    today_g_egd += 1
             if 'C' in patient.exam_type:
                 if patient.exam_class == "건진":
                     today_g_colon += 1
                 elif patient.exam_class == "진료":
+                    today_j_colon += 1
+                elif patient.exam_class == "건진+진료":
                     today_j_colon += 1
             if 'S' in patient.exam_type: today_sig += 1
     context['today_g_egd'], context['today_j_egd'], context['today_g_colon'], context['today_j_colon']=today_g_egd, today_j_egd, today_g_colon, today_j_colon
@@ -448,6 +458,9 @@ def home(request):
         context['second_adr'] = int(float(second_adenoma) / second_colon * 100)
     else:
         context['second_polyp_rate'] = 'None'
+
+    context['total_polyp_rate']=int(float(first_polyp+second_polyp)/context['month_total_colon']*100)
+    context['total_adenoma_rate']=int(float(first_adenoma+second_adenoma)/context['month_total_colon']*100)
 
     return render(request, 'home.html', context)
 

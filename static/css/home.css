@@ -12,7 +12,7 @@ div#left_upper {
     left:5px;
     background: #E6FFFF;
     width: 565px;
-    height: 230px;
+    height: 200px;
     margin: 0px 0px 0px 0px;
     border: 5px solid #489CFF;
     padding-left : 20px;
@@ -26,7 +26,7 @@ div#right_upper{
     top: 55px;
     left: 605px;
     width:565px;
-    height: 230px;
+    height: 200px;
     background:#E6FFFF;
     margin: 0px 0px 0px 0px;
     border: 5px solid #489CFF;
@@ -37,10 +37,10 @@ div#right_upper{
 
 div#middle_left{
     position: absolute;
-    top: 300px;
+    top: 270px;
     left: 5px;
     width: 365px;
-    height: 230px;
+    height: 200px;
     background:#E6FFFF;
     margin: 0px 0px 0px 0px;
     border: 5px solid #489CFF;
@@ -51,10 +51,10 @@ div#middle_left{
 
 div#middle_center{
     position: absolute;
-    top: 300px;
+    top: 270px;
     left: 405px;
     width: 365px;
-    height: 230px;
+    height: 200px;
     background:#E6FFFF;
     margin: 0px 0px 0px 0px;
     border: 5px solid #489CFF;
@@ -65,10 +65,10 @@ div#middle_center{
 
 div#middle_right{
     position: absolute;
-    top: 300px;
+    top: 270px;
     left: 805px;
     width: 365px;
-    height: 230px;
+    height: 200px;
     background:#E6FFFF;
     margin: 0px 0px 0px 0px;
     border: 5px solid #489CFF;
@@ -78,10 +78,10 @@ div#middle_right{
 }
 div#low{
     position: absolute;
-    top: 560px;
+    top: 490px;
     left: 5px;
     width: 1200px;
-    height: 300px;
+    height: 400px;
     background:#FFFFFF;
     margin: 0px 0px 0px 0px;
     border: 0px ;
@@ -96,5 +96,5 @@ h1 {
     line-height: 200%
     }
 h2 {font-size : 25px;
-    line-height:200%;
+    line-height:150%;
     }
