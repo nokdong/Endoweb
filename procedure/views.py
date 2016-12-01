@@ -450,17 +450,20 @@ def home(request):
     context['second_colon'] = second_colon
     if first_colon != 0:
         context['first_polyp_rate'] = int(float(first_polyp) / first_colon * 100)
-        context['first_adr'] = int(float(first_adenoma) / first_colon * 100)
+        context['first_adenoma_rate'] = int(float(first_adenoma) / first_colon * 100)
     else:
-        context['first_polyp_rate'] = 'None'
+        context['first_polyp_rate'], context['first_adenoma_rate'] = '0','0'
     if second_colon != 0:
         context['second_polyp_rate'] = int(float(second_polyp) / second_colon * 100)
         context['second_adr'] = int(float(second_adenoma) / second_colon * 100)
     else:
-        context['second_polyp_rate'] = 'None'
+        context['second_polyp_rate'],context['second_adenoma_rate'] = '0','0'
 
-    context['total_polyp_rate']=int(float(first_polyp+second_polyp)/context['month_total_colon']*100)
-    context['total_adenoma_rate']=int(float(first_adenoma+second_adenoma)/context['month_total_colon']*100)
+    if month_total_colon!=0:
+        context['total_polyp_rate']=int(float(first_polyp+second_polyp)/context['month_total_colon']*100)
+        context['total_adenoma_rate']=int(float(first_adenoma+second_adenoma)/context['month_total_colon']*100)
+    else :
+        context['total_polyp_rate'], context['total_adenoma_rate']='0','0'
 
     return render(request, 'home.html', context)
 
