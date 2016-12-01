@@ -266,14 +266,17 @@ def thismonth(request):
     if first_colon !=0:
         context['first_polyp_rate']=int(float(first_polyp)/first_colon *100)
         context['first_adr'] = int(float(first_adenoma) / first_colon * 100)
-    else : context['first_polyp_rate']='None'
+    else : context['first_polyp_rate']='0'
     if second_colon !=0:
         context['second_polyp_rate'] = int(float(second_polyp) / second_colon * 100)
         context['second_adr'] = int(float(second_adenoma) / second_colon * 100)
-    else : context['second_polyp_rate']='None'
+    else : context['second_polyp_rate']='0'
 
-    context['total_polyp_rate'] = int(float(first_polyp + second_polyp) / context['total_colon'] * 100)
-    context['total_adenoma_rate'] = int(float(first_adenoma + second_adenoma) / context['total_colon'] * 100)
+    if context['total_colon']!=0:
+        context['total_polyp_rate'] = int(float(first_polyp + second_polyp) / context['total_colon'] * 100)
+        context['total_adenoma_rate'] = int(float(first_adenoma + second_adenoma) / context['total_colon'] * 100)
+    else:
+        context['total_polyp_rate'],context['total_adenoma_rate']='0','0'
 
     return render(request, 'procedure/this_month_list.html', context)
 
