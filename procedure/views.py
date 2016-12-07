@@ -462,7 +462,7 @@ def home(request):
     else:
         context['second_polyp_rate'],context['second_adenoma_rate'] = '0','0'
 
-    if month_total_colon!=0:
+    if context['month_total_colon']!=0:
         context['total_polyp_rate']=int(float(first_polyp+second_polyp)/context['month_total_colon']*100)
         context['total_adenoma_rate']=int(float(first_adenoma+second_adenoma)/context['month_total_colon']*100)
     else :
