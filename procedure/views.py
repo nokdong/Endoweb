@@ -12,7 +12,7 @@ from graphos.renderers.gchart import ColumnChart
 from graphos.sources.simple import SimpleDataSource
 
 from endo.views import LoginRequiredMixin
-from procedure.forms import ProcedureSearchForm
+from procedure.forms import ProcedureSearchForm, DurationStaticForm
 from procedure.models import Exam
 
 
@@ -49,9 +49,27 @@ class ProcedureFormView(LoginRequiredMixin, FormView):
         context['form']=form
         context['search_term']=schword
         context['object_list']=post_list
-        print (context)
 
         return render(self.request, self.template_name, context)
+
+class DurationStatic(LoginRequiredMixin, FormView):
+    form_class = DurationStaticForm
+    template_name = 'procedure/duration_static.html'
+
+    def form_valid(self, form):
+        first_date=self.request.POST['first_date']
+        last_date=self.request.POST['last_date']
+
+        context={}
+        object_list=Exam.objects.filter(Q(exam_date__gte=first_date) & Q(exam_date__lte=last_date))
+        object_list.order_by('exam_date')
+        print (object_list)
+        context['form'] = form
+        context['object_list']=object_list
+
+
+        return render(self.request, self.template_name, context)
+
 
 
 

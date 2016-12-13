@@ -20,6 +20,7 @@ urlpatterns = [
     url(r'^$', views.ExamCreateView.as_view(), name='basic'),
     url(r'^add/$', views.ExamCreateView.as_view(), name='add'),
     url(r'^search/$', views.ProcedureFormView.as_view(), name='search'),
+    url(r'^duration_static/$', views.DurationStatic.as_view(), name='duration_static'),
     url(r'^reading/$', views.ReadingListView.as_view(), name="readinglist"),
     url(r'^(?P<pk>[0-9]+)/readingupdate/$', views.ReadingUpdateview.as_view(), name="readingupdate"),
     url(r'^biopsy/$', views.BxListView.as_view(), name="biopsy"),
