@@ -364,7 +364,7 @@ def homegraph(request):
 
     output_file('/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
     save(layout)
-    return render(request, '/procedure/vbar.html')
+    return render(request, '/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
     '''
     data=year_data()
     data_source = SimpleDataSource(data=data)
