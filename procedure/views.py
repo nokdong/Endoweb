@@ -14,6 +14,9 @@ from graphos.sources.simple import SimpleDataSource
 from endo.views import LoginRequiredMixin
 from procedure.forms import ProcedureSearchForm, DurationStaticForm
 from procedure.models import Exam
+from bokeh.plotting import figure, show, save, output_file
+from bokeh.layouts import column
+from bokeh.models.widgets import Panel, Tabs
 
 
 class HomeView(TemplateView):
@@ -299,34 +302,30 @@ def thismonth(request):
     return render(request, 'procedure/this_month_list.html', context)
 
 
-def year_data():
-    today=date.today()
-    today_year=today.year
-    today_month=today.month
+
+
+def year_data(year):
+
     egd=0
     colon=0
-    all_patients = Exam.objects.all()
-    data=[
-        ['달','위내시경','대장내시경'],
-    ]
 
-    monthly_number={}
-    for month in range(1, today_month+1):
-        monthly_number[month]=[0,0]
+    all_patients = Exam.objects.all()
+
+    all_month = [1,2,3,4,5,6,7,8,9,10,11,12]
+    monthly_egd= {1: 0,2: 0,3: 0,4: 0,5: 0,6: 0,7: 0,8: 0,9: 0,10: 0,11: 0,12: 0}
+    monthly_colon = {1: 0,2: 0,3: 0,4: 0,5: 0,6: 0,7: 0,8: 0,9: 0,10: 0,11: 0,12: 0}
 
     for patient in all_patients:
         patient_year=patient.exam_date.year
         patient_month=patient.exam_date.month
-        for month in range(1,today_month+1):
-            if patient_year==today_year and patient_month==month:
+        for month in range(1,13):
+            if patient_year==year and patient_month==month:
                 if 'E' in patient.exam_type:
-                    monthly_number[month][0]+=1
+                    monthly_egd[month]+=1
                 if 'C' in patient.exam_type or 'S' in patient.exam_type:
-                    monthly_number[month][1] += 1
+                    monthly_colon[month] += 1
 
-    for month in monthly_number:
-         data.append([str(month), monthly_number[month][0], monthly_number[month][1]])
-    return data
+    return (monthly_egd, monthly_colon)
 
 @login_required
 def graph(request):
@@ -337,11 +336,41 @@ def graph(request):
     return render(request, 'procedure/year_graph.html', context)
 
 def homegraph(request):
+    egd_2015 = {1:436, 2:298, 3:155, 4:110, 5:54, 6:65, 7:67, 8:51, 9:61, 10:85, 11:114, 12:185}
+    colon_2015 ={1:19, 2:12, 3:29, 4:27, 5:11, 6:4, 7:19, 8:8, 9:10, 10:15, 11:19, 12:38}
+    egd_2016 = {1:291, 2:219, 3:102, 4:84, 5:65, 6:92, 7:73, 8:79, 9:70, 10:84, 11:123, 12:163}
+    colon_2016 = {1:20, 2:23, 3:40, 4:43, 5:30, 6:35, 7:28, 8:29, 9:17, 10:21, 11:29, 12:50}
+
+    today = date.today()
+    monthly_egd, monthly_colon = year_data(today.year)
+
+    egd = figure(x_axis_type ='datetime', x_axis_label ='월', y_axis_label = '개수', width=1000, height=350)
+    egd.vbar(x=[1,2,3,4,5,6,7,8,9,10,11,12], width=0.5, bottom=0,
+           top=list(monthly_egd.values()), color='firebrick', alpha = 0.5, legend = '2017')
+    egd.circle([1,2,3,4,5,6,7,8,9,10,11,12],list(egd_2016.values()), size = 10,  color='navy', legend = '2016')
+    egd.circle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], list(egd_2015.values()), size=10, color='DarkCyan', legend = '2015')
+    egd_tab = Panel(child = egd, title = "위내시경 추이")
+
+    colon = figure(x_axis_type ='datetime', x_axis_label ='월', y_axis_label = '개수',width = 1000, height=350)
+    colon.vbar(x=[1,2,3,4,5,6,7,8,9,10,11,12], width=0.5, bottom=0,
+           top=list(monthly_colon.values()), color='blue', alpha = 0.5, legend = "2017")
+    colon.circle([1,2,3,4,5,6,7,8,9,10,11,12],list(colon_2016.values()), size = 10,  color='Red', legend = '2016')
+    colon.circle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], list(colon_2015.values()), size=10,  color='HotPink',
+                 legend='2015')
+    colon_tab = Panel(child=colon, title = "대장내시경 추이")
+    colon.legend.location = 'top_center'
+
+    layout = Tabs(tabs = [egd_tab, colon_tab])
+
+    output_file('procedure/templates/procedure/vbar.html')
+    save(layout)
+    return render(request, 'procedure/vbar.html')
+    '''
     data=year_data()
     data_source = SimpleDataSource(data=data)
     chart = ColumnChart(data_source, options={'title': "올해 내시경 추이"})
     context = {'chart': chart}
-    return render(request, 'procedure/home_year_graph.html', context)
+    return render(request, 'procedure/home_year_graph.html', context) '''
 
 def home(request):
     none_Bx = 0  # Bx 결과 안들어 간 사람
