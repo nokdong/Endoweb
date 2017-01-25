@@ -362,9 +362,9 @@ def homegraph(request):
 
     layout = Tabs(tabs = [egd_tab, colon_tab])
 
-    output_file('procedure/vbar.html')
+    output_file('nokdong/Endoweb/procedure/templates/procedure/vbar.html')
     save(layout)
-    return render(request, 'procedure/vbar.html')
+    return render(request, '/procedure/vbar.html')
     '''
     data=year_data()
     data_source = SimpleDataSource(data=data)
