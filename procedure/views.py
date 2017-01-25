@@ -362,7 +362,7 @@ def homegraph(request):
 
     layout = Tabs(tabs = [egd_tab, colon_tab])
 
-    output_file('home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
+    output_file('/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
     save(layout)
     return render(request, '/procedure/vbar.html')
     '''
