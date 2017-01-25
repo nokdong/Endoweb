@@ -346,16 +346,16 @@ def homegraph(request):
 
     egd = figure(x_axis_type ='datetime', x_axis_label ='월', y_axis_label = '개수', width=1000, height=350)
     egd.vbar(x=[1,2,3,4,5,6,7,8,9,10,11,12], width=0.5, bottom=0,
-           top=list(monthly_egd.values()), color='firebrick', alpha = 0.5, legend = '2017')
+           top=list(monthly_egd.values()), color='firebrick', alpha = 0.8, legend = '2017')
     egd.circle([1,2,3,4,5,6,7,8,9,10,11,12],list(egd_2016.values()), size = 10,  color='navy', legend = '2016')
     egd.circle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], list(egd_2015.values()), size=10, color='DarkCyan', legend = '2015')
     egd_tab = Panel(child = egd, title = "위내시경 추이")
 
     colon = figure(x_axis_type ='datetime', x_axis_label ='월', y_axis_label = '개수',width = 1000, height=350)
     colon.vbar(x=[1,2,3,4,5,6,7,8,9,10,11,12], width=0.5, bottom=0,
-           top=list(monthly_colon.values()), color='blue', alpha = 0.5, legend = "2017")
-    colon.circle([1,2,3,4,5,6,7,8,9,10,11,12],list(colon_2016.values()), size = 10,  color='Red', legend = '2016')
-    colon.circle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], list(colon_2015.values()), size=10,  color='HotPink',
+           top=list(monthly_colon.values()), color='firebrick', alpha = 0.8, legend = "2017")
+    colon.circle([1,2,3,4,5,6,7,8,9,10,11,12],list(colon_2016.values()), size = 10,  color='navy', legend = '2016')
+    colon.circle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], list(colon_2015.values()), size=10,  color='DarkCyan',
                  legend='2015')
     colon_tab = Panel(child=colon, title = "대장내시경 추이")
     colon.legend.location = 'top_center'
