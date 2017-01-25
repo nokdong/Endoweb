@@ -351,7 +351,9 @@ def homegraph(request):
     egd.circle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], list(egd_2015.values()), size=10, color='DarkCyan', legend = '2015')
     egd_tab = Panel(child = egd, title = "위내시경 추이")
 
-    colon = figure(x_axis_type ='datetime', x_axis_label ='월', y_axis_label = '개수',width = 1000, height=350)
+    colon = figure(x_axis_type ='datetime', x_axis_label ='월', y_axis_label = '개수',
+                   y_range = [0, 70],
+                   width = 1000, height=350)
     colon.vbar(x=[1,2,3,4,5,6,7,8,9,10,11,12], width=0.5, bottom=0,
            top=list(monthly_colon.values()), color='firebrick', alpha = 0.8, legend = "2017")
     colon.circle([1,2,3,4,5,6,7,8,9,10,11,12],list(colon_2016.values()), size = 10,  color='navy', legend = '2016')
@@ -359,6 +361,7 @@ def homegraph(request):
                  legend='2015')
     colon_tab = Panel(child=colon, title = "대장내시경 추이")
     colon.legend.location = 'top_center'
+
 
     layout = Tabs(tabs = [egd_tab, colon_tab])
 
