@@ -17,6 +17,7 @@ from procedure.models import Exam
 from bokeh.plotting import figure, show, save, output_file
 from bokeh.layouts import column
 from bokeh.models.widgets import Panel, Tabs
+from bokeh.models import Legend
 
 
 class HomeView(TemplateView):
@@ -344,28 +345,43 @@ def homegraph(request):
     today = date.today()
     monthly_egd, monthly_colon = year_data(today.year)
 
-    egd = figure(x_axis_type ='datetime', x_axis_label ='월', y_axis_label = '개수', width=1000, height=350)
-    egd.vbar(x=[1,2,3,4,5,6,7,8,9,10,11,12], width=0.5, bottom=0,
-           top=list(monthly_egd.values()), color='firebrick', alpha = 0.8, legend = '2017')
-    egd.circle([1,2,3,4,5,6,7,8,9,10,11,12],list(egd_2016.values()), size = 10,  color='navy', legend = '2016')
-    egd.circle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], list(egd_2015.values()), size=10, color='DarkCyan', legend = '2015')
+    egd = figure(x_axis_type ='datetime', x_axis_label ='월', y_axis_label = '개수', width=1000, height=330, toolbar_location = "above")
+    #egd.background_fill_color = 'LightCyan'
+    e1=egd.vbar(x=[1,2,3,4,5,6,7,8,9,10,11,12], width=0.5, bottom=0,
+           top=list(monthly_egd.values()), color='firebrick', alpha = 0.8)
+    e2=egd.circle([1,2,3,4,5,6,7,8,9,10,11,12],list(egd_2016.values()), size = 10,  color='navy')
+    e3=egd.circle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], list(egd_2015.values()), size=10, color='DarkCyan')
     egd_tab = Panel(child = egd, title = "위내시경 추이")
 
-    colon = figure(x_axis_type ='datetime', x_axis_label ='월', y_axis_label = '개수',
-                   y_range = [0, 80],
-                   width = 1000, height=350)
-    colon.vbar(x=[1,2,3,4,5,6,7,8,9,10,11,12], width=0.5, bottom=0,
-           top=list(monthly_colon.values()), color='firebrick', alpha = 0.8, legend = "2017")
-    colon.circle([1,2,3,4,5,6,7,8,9,10,11,12],list(colon_2016.values()), size = 10,  color='navy', legend = '2016')
-    colon.circle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], list(colon_2015.values()), size=10,  color='DarkCyan',
-                 legend='2015')
-    colon_tab = Panel(child=colon, title = "대장내시경 추이")
+    colon = figure(x_axis_type ='datetime', x_axis_label ='월', y_axis_label = '개수', width = 1000, height=330, toolbar_location = "above")
+    c1=colon.vbar(x=[1,2,3,4,5,6,7,8,9,10,11,12], width=0.5, bottom=0,
+           top=list(monthly_colon.values()), color='firebrick', alpha = 0.8)
+    c2 =colon.circle([1,2,3,4,5,6,7,8,9,10,11,12],list(colon_2016.values()), size = 10,  color='navy')
+    c3 =colon.circle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], list(colon_2015.values()), size=10,  color='DarkCyan')
+    egd_legend = Legend(items = [
+        ("2017년", [e1]),
+        ("2016년", [e2]),
+        ("2015년", [e3]),], location = (0,-30))
+    egd_legend.border_line_color = 'SkyBlue'
+    egd_legend.border_line_width = 3
+    egd.add_layout(egd_legend, 'right')
+    colon_legend = Legend(items=[
+        ("2017년", [c1]),
+        ("2016년", [c2]),
+        ("2015년", [c3]), ], location=(0, -30))
+    colon_legend.border_line_color = 'SkyBlue'
+    colon_legend.border_line_width = 3
+    colon.add_layout(colon_legend, 'right')
 
+    colon_tab = Panel(child=colon, title = "대장내시경 추이")
     layout = Tabs(tabs = [egd_tab, colon_tab])
 
     output_file('/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
+    #output_file('procedure/templates/procedure/vbar.html')
+
     save(layout)
     return render(request, '/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
+    #return render(request, 'procedure/vbar.html')
     '''
     data=year_data()
     data_source = SimpleDataSource(data=data)
