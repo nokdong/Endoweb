@@ -14,10 +14,10 @@ from graphos.sources.simple import SimpleDataSource
 from endo.views import LoginRequiredMixin
 from procedure.forms import ProcedureSearchForm, DurationStaticForm
 from procedure.models import Exam
-from bokeh.plotting import figure, show, save, output_file
+from bokeh.plotting import figure, save, output_file, ColumnDataSource
 from bokeh.layouts import column
 from bokeh.models.widgets import Panel, Tabs
-from bokeh.models import Legend
+from bokeh.models import Legend, HoverTool
 
 
 class HomeView(TemplateView):
@@ -326,7 +326,7 @@ def year_data(year):
                 if 'C' in patient.exam_type or 'S' in patient.exam_type:
                     monthly_colon[month] += 1
 
-    return (monthly_egd, monthly_colon)
+    return list(monthly_egd.values()), list(monthly_colon.values())
 
 @login_required
 def graph(request):
@@ -337,27 +337,31 @@ def graph(request):
     return render(request, 'procedure/year_graph.html', context)
 
 def homegraph(request):
-    egd_2015 = {1:436, 2:298, 3:155, 4:110, 5:54, 6:65, 7:67, 8:51, 9:61, 10:85, 11:114, 12:185}
-    colon_2015 ={1:19, 2:12, 3:29, 4:27, 5:11, 6:4, 7:19, 8:8, 9:10, 10:15, 11:19, 12:38}
-    egd_2016 = {1:291, 2:219, 3:102, 4:84, 5:65, 6:92, 7:73, 8:79, 9:70, 10:84, 11:123, 12:163}
-    colon_2016 = {1:20, 2:23, 3:40, 4:43, 5:30, 6:35, 7:28, 8:29, 9:17, 10:21, 11:29, 12:50}
-
     today = date.today()
     monthly_egd, monthly_colon = year_data(today.year)
+    #total_months = [1,2,3,4,5,6,7,8,9,10,11,12]
+    #egd_2015 = [436, 298, 155, 110, 54, 65, 67, 51, 61, 85, 114, 185]
+    #colon_2015 =[19, 12, 29, 27, 11, 4, 19, 8, 10, 15, 19, 38]
+    #egd_2016 = [291, 219, 102, 84, 65, 92, 73, 79, 70, 84, 123, 163]
+    #colon_2016 = [20, 23, 40, 43, 30, 35, 28, 29, 17, 21, 29, 50]
 
-    egd = figure(x_axis_type ='datetime', x_axis_label ='월', y_axis_label = '개수', width=1000, height=330, toolbar_location = "above")
+    source = ColumnDataSource(
+        data={'total_months':[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], 'egd_2015':[436, 298, 155, 110, 54, 65, 67, 51, 61, 85, 114, 185],
+                  'egd_2016':[291, 219, 102, 84, 65, 92, 73, 79, 70, 84, 123, 163], 'monthly_egd':monthly_egd,
+                  'colon_2015':[19, 12, 29, 27, 11, 4, 19, 8, 10, 15, 19, 38], 'colon_2016':[20, 23, 40, 43, 30, 35, 28, 29, 17, 21, 29, 50],
+                  'monthly_colon':monthly_colon})
+
+    egd = figure(x_axis_type ='datetime', x_axis_label ='월', y_axis_label = '개수', width=1000, height=330,  tools=[], toolbar_location = "above")
     #egd.background_fill_color = 'LightCyan'
-    e1=egd.vbar(x=[1,2,3,4,5,6,7,8,9,10,11,12], width=0.5, bottom=0,
-           top=list(monthly_egd.values()), color='firebrick', alpha = 0.8)
-    e2=egd.circle([1,2,3,4,5,6,7,8,9,10,11,12],list(egd_2016.values()), size = 10,  color='navy')
-    e3=egd.circle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], list(egd_2015.values()), size=10, color='DarkCyan')
+    e1=egd.vbar(x='total_months', width=0.5, bottom=0, top='monthly_egd', color='firebrick', alpha = 0.8, source=source)
+    egd.add_tools(HoverTool(renderers = [e1], tooltips=[("개수", '@monthly_egd')]))
+    e2=egd.circle('total_months','egd_2016', size = 10,  color='navy', source=source)
+    egd.add_tools(HoverTool(renderers=[e2], tooltips=[("개수", '@egd_2016')]))
+    e3=egd.circle('total_months', 'egd_2015', size=10, color='DarkCyan', source=source)
+    egd.add_tools(HoverTool(renderers=[e3], tooltips=[("개수", '@egd_2015')]))
+
     egd_tab = Panel(child = egd, title = "위내시경 추이")
 
-    colon = figure(x_axis_type ='datetime', x_axis_label ='월', y_axis_label = '개수', width = 1000, height=330, toolbar_location = "above")
-    c1=colon.vbar(x=[1,2,3,4,5,6,7,8,9,10,11,12], width=0.5, bottom=0,
-           top=list(monthly_colon.values()), color='firebrick', alpha = 0.8)
-    c2 =colon.circle([1,2,3,4,5,6,7,8,9,10,11,12],list(colon_2016.values()), size = 10,  color='navy')
-    c3 =colon.circle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], list(colon_2015.values()), size=10,  color='DarkCyan')
     egd_legend = Legend(items = [
         ("2017년", [e1]),
         ("2016년", [e2]),
@@ -365,10 +369,16 @@ def homegraph(request):
     egd_legend.border_line_color = 'SkyBlue'
     egd_legend.border_line_width = 3
     egd.add_layout(egd_legend, 'right')
-    colon_legend = Legend(items=[
-        ("2017년", [c1]),
-        ("2016년", [c2]),
-        ("2015년", [c3]), ], location=(0, -30))
+
+    colon = figure(x_axis_type ='datetime', x_axis_label ='월', y_axis_label = '개수', width = 1000, height=330, tools=[], toolbar_location = "above")
+    c1=colon.vbar(x='total_months', width=0.5, bottom=0, top='monthly_colon', color='firebrick', alpha = 0.8, source=source)
+    colon.add_tools(HoverTool(renderers=[c1], tooltips=[("개수", '@monthly_colon')]))
+    c2 =colon.circle('total_months','colon_2016', size = 10,  color='navy', source=source)
+    colon.add_tools(HoverTool(renderers=[c2], tooltips=[("개수", '@colon_2016')]))
+    c3 =colon.circle('total_months', 'colon_2015', size=10,  color='DarkCyan', source=source)
+    colon.add_tools(HoverTool(renderers=[c3], tooltips=[("개수", '@colon_2015')]))
+
+    colon_legend = Legend(items=[("2017년", [c1]), ("2016년", [c2]), ("2015년", [c3]), ], location=(0, -30))
     colon_legend.border_line_color = 'SkyBlue'
     colon_legend.border_line_width = 3
     colon.add_layout(colon_legend, 'right')
@@ -382,12 +392,17 @@ def homegraph(request):
     save(layout)
     return render(request, '/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
     #return render(request, 'procedure/vbar.html')
-    '''
+
+
+
+'''
     data=year_data()
     data_source = SimpleDataSource(data=data)
     chart = ColumnChart(data_source, options={'title': "올해 내시경 추이"})
     context = {'chart': chart}
-    return render(request, 'procedure/home_year_graph.html', context) '''
+    return render(request, 'procedure/home_year_graph.html', context)
+
+'''
 
 def home(request):
     none_Bx = 0  # Bx 결과 안들어 간 사람
@@ -434,7 +449,7 @@ def home(request):
                'total_polyp_rate': total_polyp_rate, 'total_adenoma_rate': total_adenoma_rate}
 
     for patient in all_patients:
-        if patient.exam_procedure in [['EMR'],['Polypectomy'], ['Bx']] and patient.Bx_result=='.':
+        if patient.exam_procedure in [['EMR'],['Polypectomy'],['Bx'], ['Bx', 'EMR'], ['Bx', 'Polypectomy'],['EMR','Polypectomy'],['Bx','EMR','Polypectomy']] and patient.Bx_result=='.':
             none_Bx+=1
     context['none_Bx']=none_Bx
 
@@ -534,7 +549,6 @@ def home(request):
 
     return render(request, 'home.html', context)
 
-''' testing'''
 
 
 
