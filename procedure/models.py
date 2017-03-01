@@ -18,6 +18,7 @@ class Exam(models.Model):
     exam_procedure=MultiSelectField("시술", max_length=20, max_choices=5, choices=(('None','None'),('Bx',"Bx"),('CLO','CLO'),('Polypectomy', "Polypectomy"),("EMR",'EMR'),
                                                            ('ForeignBody','Foreign Body Remove'),('BleedingControl','Bleeding Control'),('PEG','PEG')))
     Bx_result=models.CharField("조직검사 결과", max_length=200, default=".")
+    Bx_result_call=models.CharField("조직검사 결과 알려주었나요?", max_length=100, default=".")
     follow_up=models.IntegerField("추적검사 기간", default=0)
     phone_check=models.CharField("전화 통화 결과", max_length=50, default='.')
     re_visit=models.BooleanField("재방문", default=False)

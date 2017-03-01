@@ -79,9 +79,17 @@ class DurationStatic(LoginRequiredMixin, FormView):
 
 class BxUpdateview(LoginRequiredMixin, UpdateView):
     model=Exam
+    template_name = 'procedure/Bx_update.html'
     fields = ['exam_date', 'exam_type', 'exam_doc', 'exam_class', 'exam_place', 'patient_name', 'hospital_no',
-              'patient_sex', 'patient_birth','patient_phone','exam_Dx', 'exam_procedure','Bx_result','follow_up']
+              'patient_sex', 'patient_birth','patient_phone','exam_Dx', 'exam_procedure','Bx_result', 'Bx_result_call', 'follow_up']
     success_url = reverse_lazy('procedure:biopsy')
+
+class BxCallUpdateview(LoginRequiredMixin, UpdateView):
+    model=Exam
+    template_name = 'procedure/Bx_update.html'
+    fields = ['exam_date', 'exam_type', 'exam_doc', 'exam_class', 'exam_place', 'patient_name', 'hospital_no',
+              'patient_sex', 'patient_birth','patient_phone','exam_Dx', 'exam_procedure','Bx_result', 'Bx_result_call', 'follow_up']
+    success_url = reverse_lazy('procedure:Bx_call')
 
 class SearchUpdateview(LoginRequiredMixin, UpdateView):
     model=Exam
@@ -111,6 +119,17 @@ class BxListView(LoginRequiredMixin, ListView):
         result=Exam.objects.filter(Q(exam_procedure__icontains='Bx') |
                                    Q(exam_procedure__icontains='Polypectomy')|
                                    Q(exam_procedure__icontains='EMR')).distinct()
+        return result
+
+class BxCallView(LoginRequiredMixin, ListView):
+    template_name = 'procedure/Bx_call.html'
+    context_object_name='object_list'
+
+    def get_queryset(self):
+        result=Exam.objects.filter(Q(exam_date__gte = date(2017, 2, 27)) &
+                                                      (Q(exam_procedure__icontains='Bx') |
+                                   Q(exam_procedure__icontains='Polypectomy')|
+                                   Q(exam_procedure__icontains='EMR'))).distinct()
         return result
 
 class ReadingUpdateview(LoginRequiredMixin, UpdateView):
@@ -386,12 +405,12 @@ def homegraph(request):
     colon_tab = Panel(child=colon, title = "대장내시경 추이")
     layout = Tabs(tabs = [egd_tab, colon_tab])
 
-    output_file('/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
-    #output_file('procedure/templates/procedure/vbar.html')
+    #output_file('/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
+    output_file('procedure/templates/procedure/vbar.html')
 
     save(layout)
-    return render(request, '/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
-    #return render(request, 'procedure/vbar.html')
+    #return render(request, '/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
+    return render(request, 'procedure/vbar.html')
 
 
 
@@ -406,6 +425,7 @@ def homegraph(request):
 
 def home(request):
     none_Bx = 0  # Bx 결과 안들어 간 사람
+    Bx_call = 0 # Bx 결과 전화 통보 해 줘야 할 사람
     none_reading = 0  # 판독 안들어 간 사람
     will_phone = 0  # 전화해야할 사람
 
@@ -435,7 +455,7 @@ def home(request):
     this_year = today.year
 
     all_patients = Exam.objects.all()
-    context = {'none_Bx': 0, 'none_reading': 0, 'will_phone': 0,
+    context = {'none_Bx': 0, 'Bx_call':0, 'none_reading': 0, 'will_phone': 0,
                'today_g_egd': today_g_egd, 'today_j_egd': today_j_egd,
                'today_g_colon': today_g_colon, 'today_j_colon': today_j_colon, 'today_sig': 0,
                'today_total_egd':0, 'today_total_colon':0,
@@ -452,6 +472,11 @@ def home(request):
         if patient.exam_procedure in [['EMR'],['Polypectomy'],['Bx'], ['Bx', 'EMR'], ['Bx', 'Polypectomy'],['EMR','Polypectomy'],['Bx','EMR','Polypectomy']] and patient.Bx_result=='.':
             none_Bx+=1
     context['none_Bx']=none_Bx
+
+    for patient in all_patients:
+        if patient.exam_procedure in [['EMR'],['Polypectomy'],['Bx'], ['Bx', 'EMR'], ['Bx', 'Polypectomy'],['Polypectomy', 'EMR'],['Bx','Polypectomy','EMR'],['Bx','CLO'],['CLO'],['CLO','EMR'],['CLO','Polypectomy','EMR']] and patient.Bx_result_call =='.' and patient.exam_date >= date(2017, 2, 27):
+            Bx_call+=1
+    context['Bx_call']=Bx_call
 
     for patient in all_patients:
         if patient.exam_Dx=='.': none_reading+=1

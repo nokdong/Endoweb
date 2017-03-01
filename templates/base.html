@@ -14,7 +14,7 @@
 <body>
 
 <div id="header">
-    <h2 class="maintitle"><a href="#"> <a href="{% url 'home' %}"> 내시경 환자 관리 시스템 v 1.0</a></h2>
+    <h2 class="maintitle"><a href="#"> <a href="{% url 'home' %}"> 내시경 환자 관리 시스템 v 1.2</a></h2>
     {% if user.is_active %}
     <h4 class="welcome">Welcome,
         <strong> {% firstof user.get_short_name user.get_username %}.</strong>
@@ -39,9 +39,14 @@
             <li><a href="{% url 'procedure:duration_static' %}"> 구간별 명단</a> </li>
         </ul>
     </li>
-    <li><a href="{% url 'procedure:biopsy' %}">조직검사 입력</a></li>
+    <li><a href="#">조직검사&bigtriangledown;</a>
+        <ul>
+            <li><a href="{% url 'procedure:biopsy' %}">입력해주세요</a></li>
+            <li><a href="{% url 'procedure:Bx_call' %}">전화해주세요</a></li>
+        </ul>
+    </li>
     <li><a href="{% url 'procedure:readinglist' %}">판독 입력</a></li>
-    <li><a href="{% url 'procedure:phone' %}">전화해주세요</a></li>
+    <li><a href="{% url 'procedure:phone' %}">재방문전화</a></li>
     <li><a href="{% url 'procedure:search' %}"> 환자 찾기</a></li>
 </div>
 {% block content %}{% endblock %}
