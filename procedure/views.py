@@ -405,12 +405,12 @@ def homegraph(request):
     colon_tab = Panel(child=colon, title = "대장내시경 추이")
     layout = Tabs(tabs = [egd_tab, colon_tab])
 
-    #output_file('/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
-    output_file('procedure/templates/procedure/vbar.html')
+    output_file('/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
+    #output_file('procedure/templates/procedure/vbar.html')
 
     save(layout)
-    #return render(request, '/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
-    return render(request, 'procedure/vbar.html')
+    return render(request, '/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
+    #return render(request, 'procedure/vbar.html')
 
 
 
