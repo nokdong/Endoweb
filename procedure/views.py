@@ -1,4 +1,5 @@
-from datetime import date
+from datetime import date, datetime
+import collections
 
 from django import forms
 from django.contrib.auth.decorators import login_required
@@ -8,8 +9,8 @@ from django.shortcuts import render
 from django.views.generic import CreateView, ListView, UpdateView
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
-from graphos.renderers.gchart import ColumnChart
-from graphos.sources.simple import SimpleDataSource
+# from graphos.renderers.gchart import ColumnChart
+# from graphos.sources.simple import SimpleDataSource
 
 from endo.views import LoginRequiredMixin
 from procedure.forms import ProcedureSearchForm, DurationStaticForm
@@ -19,6 +20,7 @@ from bokeh.layouts import column
 from bokeh.models.widgets import Panel, Tabs
 from bokeh.models import Legend, HoverTool
 
+request_token = None
 
 class HomeView(TemplateView):
     template_name="home.html"
@@ -40,39 +42,55 @@ class ExamCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         return super(ExamCreateView, self).form_valid(form)
 
+def post_update_search(request):
+    template_name = 'procedure/post_search.html'
+    return render(request, template_name, request_token)
+
 
 class ProcedureFormView(LoginRequiredMixin, FormView):
     form_class = ProcedureSearchForm
     template_name='procedure/post_search.html'
 
     def form_valid(self, form):
+        global request_token
         schword='%s' % self.request.POST['search_word']
-        post_list=Exam.objects.filter(Q(patient_name__icontains=schword) |
-                                      Q(hospital_no__icontains=schword)).distinct()
+        first_date = self.request.POST['first_date_year']+'-'+self.request.POST['first_date_month']+'-'+self.request.POST['first_date_day']
+        last_date = self.request.POST['last_date_year'] + '-' + self.request.POST['last_date_month'] + '-' + self.request.POST['last_date_day']
+        if first_date =='0-0-0' and last_date == '0-0-0':
+            post_list = Exam.objects.filter(Q(patient_name__icontains=schword) | Q(hospital_no=schword) |
+                                            Q(Bx_result__icontains = schword)).distinct()
+            patient_number=len(post_list)
+        elif first_date is not '0-0-0' and last_date is not '0-0-0':
+            post_list=Exam.objects.filter((Q(exam_date__gte=first_date) & Q(exam_date__lte=last_date)) & (Q(patient_name__icontains=schword) |
+                                      Q(hospital_no=schword) | Q(Bx_result__icontains=schword))).distinct()
+            patient_number = len(post_list)
         context={}
         context['form']=form
         context['search_term']=schword
         context['object_list']=post_list
+        context['patient_number']=patient_number
+        #context['request']=str(self.request.POST)
+        request_token = context
 
         return render(self.request, self.template_name, context)
 
-class DurationStatic(LoginRequiredMixin, FormView):
-    form_class = DurationStaticForm
-    template_name = 'procedure/duration_static.html'
 
-    def form_valid(self, form):
-        first_date=self.request.POST['first_date']
-        last_date=self.request.POST['last_date']
-
-        context={}
-        object_list=Exam.objects.filter(Q(exam_date__gte=first_date) & Q(exam_date__lte=last_date))
-        object_list.order_by('exam_date')
-        print (object_list)
-        context['form'] = form
-        context['object_list']=object_list
-
-
-        return render(self.request, self.template_name, context)
+# class DurationStatic(LoginRequiredMixin, FormView):
+#     form_class = DurationStaticForm
+#     template_name = 'procedure/duration_static.html'
+#
+#     def form_valid(self, form):
+#         first_date=self.request.POST['first_date']
+#         last_date=self.request.POST['last_date']
+#
+#         context={}
+#         object_list=Exam.objects.filter(Q(exam_date__gte=first_date) & Q(exam_date__lte=last_date))
+#         object_list.order_by('exam_date')
+#         context['form'] = form
+#         context['object_list']=object_list
+#
+#
+#         return render(self.request, self.template_name, context)
 
 
 
@@ -90,14 +108,21 @@ class BxCallUpdateview(LoginRequiredMixin, UpdateView):
     fields = ['exam_date', 'exam_type', 'exam_doc', 'exam_class', 'exam_place', 'patient_name', 'hospital_no',
               'patient_sex', 'patient_birth','patient_phone','exam_Dx', 'exam_procedure','Bx_result', 'Bx_result_call', 'follow_up']
     success_url = reverse_lazy('procedure:Bx_call')
+'''
+@login_required
+def search_update_func(request, pk, q):
+    patient=Exam.objects.get(id=pk)
+    print (patient.exam_date)
 
+    return
+'''
 class SearchUpdateview(LoginRequiredMixin, UpdateView):
     model=Exam
     fields = ['exam_date', 'exam_type', 'exam_doc', 'exam_class', 'exam_place', 'patient_name', 'hospital_no',
               'patient_sex', 'patient_birth','patient_phone','exam_Dx', 'exam_procedure','Bx_result', 'Bx_result_call','follow_up',
               'phone_check','re_visit']
     template_name = 'procedure/post_search_update.html'
-    success_url = reverse_lazy('procedure:search')
+    success_url = reverse_lazy('procedure:post_update_search')
 
 class TodayUpdateview(LoginRequiredMixin, UpdateView):
     model=Exam
@@ -255,46 +280,27 @@ def thismonth(request):
     today=date.today()
     this_month=today.month
     this_year=today.year
-    all_patients=Exam.objects.all()
+
+    monthly_data = Exam.objects.filter(exam_date__year=this_year).filter(exam_date__month=this_month)
+    g_egd = monthly_data.filter(exam_type__contains='E').filter(exam_class__contains="건진").count()
+    j_egd = monthly_data.filter(exam_type__contains = 'E').filter(exam_class__contains="진료").exclude(exam_class = "건진+진료").count()
+    g_colon = monthly_data.filter(exam_type__contains='C').filter(exam_class__contains="건진").exclude(exam_class = "건진+진료").count()
+    j_colon = monthly_data.filter(exam_type__contains='C').filter(exam_class__contains="진료").count()
+    sig = monthly_data.filter(exam_type__contains='S').count()
+    first_colon=monthly_data.filter(exam_doc = '이영재').filter(exam_type__contains='C').count()
+    second_colon=monthly_data.filter(exam_doc = '김신일').filter(exam_type__contains='C').count()
+    first_polyp=monthly_data.filter(exam_doc = '이영재').filter(exam_type__contains='C').filter(exam_Dx__contains = 'polyp').count()
+    second_polyp = monthly_data.filter(exam_doc='김신일').filter(exam_type__contains='C').filter(
+        exam_Dx__contains='polyp').count()
+    first_adenoma = monthly_data.filter(exam_doc = '이영재').filter(exam_type__contains='C').filter(Bx_result__contains = 'adenoma').count()
+    second_adenoma = monthly_data.filter(exam_doc='김신일').filter(exam_type__contains='C').filter(Bx_result__contains='adenoma').count()
+
+
     context={'object_list':[],'g_egd':0, 'j_egd':0, 'total_egd':0, 'g_colon':0, 'j_colon':0, 'total_colon':0, 'sig':0, 'first_colon':0,
              'first_polyp_rate':0, 'first_adr':0, 'second_colon':0, 'second_polyp_rate':0, 'second_adr':0,
              'total_polyp_rate':0, 'total_adenoma_rate':0}
-    for patient in all_patients:
-        if patient.exam_date.year==this_year and patient.exam_date.month==this_month:
-            context['object_list'].append(patient)
-            if 'E' in patient.exam_type:
-                if patient.exam_class =='건진':
-                    g_egd+=1
-                elif patient.exam_class=="진료":
-                    j_egd+=1
-                elif patient.exam_class == "건진+진료":
-                    g_egd+=1
 
-            if 'C' in patient.exam_type:
-                if patient.exam_doc=="이영재":
-                    first_colon+=1
-                    if 'Polypectomy' in patient.exam_procedure or 'EMR' in patient.exam_procedure:
-                        first_polyp+=1
-                    if 'adenoma' in patient.Bx_result:
-                        first_adenoma+=1
-                elif patient.exam_doc=="김신일":
-                    second_colon+=1
-                    if 'Polypectomy' in patient.exam_procedure or 'EMR' in patient.exam_procedure:
-                        second_polyp+=1
-                    if 'adenoma' in patient.Bx_result:
-                        second_adenoma+=1
-
-                if patient.exam_class=="건진":
-                    g_colon+=1
-                elif patient.exam_class=="진료":
-                    j_colon+=1
-                elif patient.exam_class=="건진+진료":
-                    j_colon+=1
-
-
-
-            if 'S' in patient.exam_type : sig+=1
-
+    context['object_list'] = monthly_data
     context['g_egd']=g_egd
     context['j_egd'] = j_egd
     context['total_egd']=g_egd+j_egd
@@ -321,7 +327,140 @@ def thismonth(request):
 
     return render(request, 'procedure/this_month_list.html', context)
 
+def re_visited(current_year, current_month, objects):
+    visited=0
+    call=0
+    for patient in objects:
+        follow_up_date=add_month(patient.exam_date, patient.follow_up)
+        if follow_up_date.year == current_year and follow_up_date.month==current_month and patient.follow_up != 0:
+            call+=1
+            if patient.re_visit == True:
+                visited+=1
+    return int(float(visited) / call*100)
 
+def thisyear(request):
+    this_month = date.today().month
+
+    g_egd = 0  # 건진위내시경
+    j_egd = 0  # 진료위내시경
+    g_colon = 0  # 건진대장내시경
+    j_colon = 0  # 진료대장내시경
+    sig = 0
+    first_colon = 0
+    second_colon = 0
+    first_polyp = 0
+    second_polyp = 0
+    first_adenoma = 0
+    second_adenoma = 0
+    total_sum_re_visit=0
+    today = date.today()
+    this_month = today.month
+    this_year = today.year
+
+    monthly_total_data=collections.OrderedDict()
+    until_now_total = {'until_now_total_egd':0, 'until_now_g_egd':0, 'until_now_j_egd':0,
+                       'until_now_first_colon':0, 'until_now_second_colon':0, 'until_now_g_colon':0, 'until_now_j_colon':0, 'until_now_total_colon':0,
+                       'until_now_total_colon_including_sig':0,
+                       'until_now_first_polyp':0, 'until_now_second_polyp':0,
+                       'until_now_average_first_pdr':0, 'until_now_average_second_pdr':0, 'until_now_total_average_pdr':0,
+                       'until_now_first_adenoma':0, 'until_now_second_adenoma':0,
+                       'until_now_average_first_adr':0, 'until_now_second_adr':0, 'until_now_total_average_adr':0,
+                       'until_now_PEG':0, 'until_now_re_visit':0}
+
+    for month in range(1, this_month+1):
+        context = {'g_egd': 0, 'j_egd': 0, 'total_egd': 0, 'g_colon': 0, 'j_colon': 0, 'total_colon': 0,
+                   'sig': 0, 'sig_included_toal_colon':0, 'j_colon_including_sig':0,
+                   'first_colon': 0, 'first_polyp_rate': 0, 'first_adr': 0,
+                   'second_colon': 0, 'second_polyp_rate': 0, 'second_adr': 0,
+                   'total_polyp_rate': 0, 'total_adenoma_rate': 0, 'PEG':0, 're_visit':0}
+
+        monthly_data = Exam.objects.filter(exam_date__year=this_year).filter(exam_date__month=month)
+        g_egd = monthly_data.filter(exam_type__contains='E').filter(exam_class__contains="건진").count()
+        j_egd = monthly_data.filter(exam_type__contains='E').filter(exam_class__contains="진료").exclude(
+            exam_class="건진+진료").count()
+        g_colon = monthly_data.filter(exam_type__contains='C').filter(exam_class__contains="건진").exclude(
+            exam_class="건진+진료").count()
+        j_colon = monthly_data.filter(exam_type__contains='C').filter(exam_class__contains="진료").count()
+        sig = monthly_data.filter(exam_type__contains='S').count()
+        first_colon = monthly_data.filter(exam_doc='이영재').filter(exam_type__contains='C').count()
+        second_colon = monthly_data.filter(exam_doc='김신일').filter(exam_type__contains='C').count()
+        first_polyp = monthly_data.filter(exam_doc='이영재').filter(exam_type__contains='C').filter(
+            exam_Dx__contains='polyp').count()
+        second_polyp = monthly_data.filter(exam_doc='김신일').filter(exam_type__contains='C').filter(
+            exam_Dx__contains='polyp').count()
+        first_adenoma = monthly_data.filter(exam_doc='이영재').filter(exam_type__contains='C').filter(
+            Bx_result__contains='adenoma').count()
+        second_adenoma = monthly_data.filter(exam_doc='김신일').filter(exam_type__contains='C').filter(
+            Bx_result__contains='adenoma').count()
+        PEG = monthly_data.filter(exam_procedure=['PEG']).count()
+
+
+        context['g_egd'] = g_egd
+        context['j_egd'] = j_egd
+        context['total_egd'] = g_egd + j_egd
+        until_now_total['until_now_g_egd'] +=g_egd
+        until_now_total['until_now_j_egd'] += j_egd
+        until_now_total['until_now_total_egd'] += context['total_egd']
+
+        context['g_colon'] = g_colon
+        context['j_colon'] = j_colon
+        context['total_colon'] = g_colon + j_colon
+        until_now_total['until_now_g_colon']+=g_colon
+        until_now_total['until_now_j_colon'] += j_colon+sig
+        until_now_total['until_now_total_colon_including_sig'] += g_colon + j_colon + sig
+
+        context['sig'] = sig
+        context['sig_included_total_colon'] = g_colon + j_colon + sig
+        context['j_colon_including_sig']=j_colon + sig
+        context['first_colon'] = first_colon
+        context['second_colon'] = second_colon
+
+        context['PEG']=PEG
+        until_now_total['until_now_PEG'] += PEG
+
+        context['re_visit'] = re_visited(this_year, month, Exam.objects.all())
+        total_sum_re_visit += context['re_visit']
+
+        if first_colon != 0:
+            until_now_total['until_now_first_colon'] += first_colon
+            until_now_total['until_now_first_polyp'] += first_polyp
+            context['first_polyp_rate'] = int(float(first_polyp) / first_colon * 100)
+            until_now_total['until_now_first_adenoma'] +=first_adenoma
+            context['first_adr'] = int(float(first_adenoma) / first_colon * 100)
+        else:
+            context['first_polyp_rate'] = '0'
+
+        if second_colon != 0:
+            until_now_total['until_now_second_colon']+= second_colon
+            until_now_total['until_now_second_polyp'] += second_polyp
+            context['second_polyp_rate'] = int(float(second_polyp) / second_colon * 100)
+            until_now_total['until_now_second_adenoma'] += second_adenoma
+            context['second_adr'] = int(float(second_adenoma) / second_colon * 100)
+        else:
+            context['second_polyp_rate'] = '0'
+
+        if context['total_colon'] != 0:
+            context['total_polyp_rate'] = int(float(first_polyp + second_polyp) / context['total_colon'] * 100)
+            context['total_adenoma_rate'] = int(float(first_adenoma + second_adenoma) / context['total_colon'] * 100)
+        else:
+            context['total_polyp_rate'], context['total_adenoma_rate'] = '0', '0'
+
+        monthly_total_data[str(month)] = context
+
+    until_now_total['until_now_total_colon']=until_now_total['until_now_first_colon']+until_now_total['until_now_second_colon']
+    until_now_total['until_now_average_first_pdr'] = int(float(until_now_total['until_now_first_polyp']) /
+                                                          until_now_total['until_now_first_colon'] *100)
+    until_now_total['until_now_average_second_pdr'] = int(float(until_now_total['until_now_second_polyp']) /
+                                                          until_now_total['until_now_second_colon'] * 100)
+    until_now_total['until_now_total_average_pdr'] = int(float(until_now_total['until_now_first_polyp']+until_now_total['until_now_second_polyp']) / until_now_total['until_now_total_colon']*100)
+    until_now_total['until_now_average_first_adr'] = int(float(until_now_total['until_now_first_adenoma']) /
+                                                         until_now_total['until_now_first_colon'] * 100)
+    until_now_total['until_now_average_second_adr'] = int(float(until_now_total['until_now_second_adenoma']) /
+                                                         until_now_total['until_now_second_colon'] * 100)
+    until_now_total['until_now_total_average_adr'] = int(float(until_now_total['until_now_first_adenoma'] + until_now_total['until_now_second_adenoma']) / until_now_total[
+            'until_now_total_colon'] * 100)
+    until_now_total['until_now_re_visit'] = int(float(total_sum_re_visit) / len(monthly_total_data))
+    return render(request, 'procedure/this_year_summary.html',{'monthly_total_data':monthly_total_data, 'until_now_total':until_now_total} )
 
 
 def year_data(year):
@@ -405,12 +544,12 @@ def homegraph(request):
     colon_tab = Panel(child=colon, title = "대장내시경 추이")
     layout = Tabs(tabs = [egd_tab, colon_tab])
 
-    output_file('/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
-    #output_file('procedure/templates/procedure/vbar.html')
+    #output_file('/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
+    output_file('procedure/templates/procedure/vbar.html')
 
     save(layout)
-    return render(request, '/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
-    #return render(request, 'procedure/vbar.html')
+    #return render(request, '/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
+    return render(request, 'procedure/vbar.html')
 
 
 

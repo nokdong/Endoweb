@@ -1,0 +1,46 @@
+{%  extends "base.html" %}
+
+{% block title %}환자 검색 {% endblock %}
+
+{% block content %}
+<div id="content">
+    <table>
+        <tr>
+            <th rowspan="2" valign="middle"> 월</th>
+            <th> 위 내 시 경</th>
+            <th> 대 장 내 시 경</th>
+            <th> 용 종 발 견 율 (%)</th>
+            <th> 선 종 발 견 율 (%)</th>
+            <th rowspan="2"> PEG</th>
+            <th rowspan="2">재내원율 (%)</th>
+        </tr>
+        <tr>
+            <th><font color ="blue">Total</font> : 검진 / 진료</th>
+            <th><font color ="blue">Total</font> : 검진 / 진료</th>
+            <th><font color ="blue">Total</font> : 1내과(대장내시경수) / 2내과(대장내시경수)</th>
+            <th><font color ="blue">Total</font> : 1내과(대장내시경수) / 2내과(대장내시경수)</th>
+        </tr>
+
+    {% for k, v in monthly_total_data.items %}
+        <tr>
+            <td><strong>{{k}}</strong></td>
+            <td><font color ="blue"><strong>{{v.total_egd}}</strong></font> : {{v.g_egd}} / {{v.j_egd}}</td>
+            <td><font color ="blue"><strong>{{v.sig_included_total_colon}}</strong></font> : {{v.g_colon}} / {{v.j_colon_including_sig}}</td>
+            <td><font color ="blue"><strong>{{v.total_polyp_rate}}</strong></font> : {{v.first_polyp_rate}} ({{v.first_colon}}) / {{v.second_polyp_rate}} ({{v.second_colon}})</td>
+            <td><font color ="blue"><strong>{{v.total_adenoma_rate}}</strong></font> : {{v.first_adr}} ({{v.first_colon}}) / {{v.second_adr}} ({{v.second_colon}})</td>
+            <td>{{v.PEG}}</td>
+            <td>{{v.re_visit}}</td>
+
+    {% endfor %}
+        <tr>
+            <td>총합</td>
+            <td>{{until_now_total.until_now_total_egd}} : {{until_now_total.until_now_g_egd}} / {{until_now_total.until_now_j_egd}}</td>
+            <td>{{until_now_total.until_now_total_colon_including_sig}} : {{until_now_total.until_now_g_colon}} / {{until_now_total.until_now_j_colon}}</td>
+            <td>{{until_now_total.until_now_total_average_pdr}} : {{until_now_total.until_now_average_first_pdr}} ({{until_now_total.until_now_first_colon}}) / {{until_now_total.until_now_average_second_pdr}} ({{until_now_total.until_now_second_colon}})</td>
+            <td>{{until_now_total.until_now_total_average_adr}} : {{until_now_total.until_now_average_first_adr}} ({{until_now_total.until_now_first_colon}}) / {{until_now_total.until_now_average_second_adr}} ({{until_now_total.until_now_second_colon}})</td>
+            <td>{{until_now_total.until_now_PEG}}</td>
+            <td>{{until_now_total.until_now_re_visit}}</td>
+    </tr>
+    </table>
+</div>
+{% endblock %}

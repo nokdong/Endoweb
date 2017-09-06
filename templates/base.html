@@ -36,7 +36,7 @@
             <li><a href="{% url 'procedure:today' %}"> 오늘 명단</a> </li>
             <li><a href="{% url 'procedure:thismonth' %}"> 이번달 명단</a> </li>
             <!-- <li><a href="{% url 'procedure:thisyear' %}"> 올해</a> </li> -->
-            <li><a href="{% url 'procedure:duration_static' %}"> 구간별 명단</a> </li>
+            <li><a href = "{% url 'procedure:thisyearsummary' %}"> 올해 총정리</a></li>
         </ul>
     </li>
     <li><a href="#">조직검사&bigtriangledown;</a>
@@ -47,7 +47,7 @@
     </li>
     <li><a href="{% url 'procedure:readinglist' %}">판독 입력</a></li>
     <li><a href="{% url 'procedure:phone' %}">재방문전화</a></li>
-    <li><a href="{% url 'procedure:search' %}"> 환자 찾기</a></li>
+    <li><a href="{% url 'procedure:search' %}"> 검색</a></li>
 </div>
 {% block content %}{% endblock %}
 </body>
