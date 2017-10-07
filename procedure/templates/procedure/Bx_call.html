@@ -22,7 +22,7 @@
     {% for list in object_list %}
     {% if list.Bx_result_call == "." %}
     <tr>
-        <td><a href="{% url 'procedure:update' list.id %}"><font color="blue">{{ list.patient_name }}</font></a></td>
+        <td><a href="{% url 'procedure:Bx_call' list.id %}"><font color="blue">{{ list.patient_name }}</font></a></td>
         <td>{{ list.patient_sex }}</td>
         <td>{{ list.hospital_no}}</td>
         <td>{{ list.patient_birth |  date:"y, m.d"}}</td>
