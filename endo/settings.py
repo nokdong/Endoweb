@@ -130,3 +130,4 @@ MEDIA_ROOT=os.path.join(BASE_DIR, 'media')
 LOGIN_URL='/accounts/login/'
 LOGOUT_URL='/accounts/logout/'
 LOGIN_REDIRECT_URL='/'
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]', '.pythonanywhere.com']
