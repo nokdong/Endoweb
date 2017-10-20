@@ -9,8 +9,7 @@ from django.shortcuts import render
 from django.views.generic import CreateView, ListView, UpdateView
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
-# from graphos.renderers.gchart import ColumnChart
-# from graphos.sources.simple import SimpleDataSource
+
 
 from endo.views import LoginRequiredMixin
 from procedure.forms import ProcedureSearchForm, DurationStaticForm
@@ -47,22 +46,27 @@ def post_update_search(request):
     return render(request, template_name, request_token)
 
 
+
+
 class ProcedureFormView(LoginRequiredMixin, FormView):
     form_class = ProcedureSearchForm
     template_name='procedure/post_search.html'
 
     def form_valid(self, form):
         global request_token
+        print (self.request.POST)
         schword='%s' % self.request.POST['search_word']
-        first_date = self.request.POST['first_date_year']+'-'+self.request.POST['first_date_month']+'-'+self.request.POST['first_date_day']
-        last_date = self.request.POST['last_date_year'] + '-' + self.request.POST['last_date_month'] + '-' + self.request.POST['last_date_day']
-        if first_date =='0-0-0' and last_date == '0-0-0':
-            post_list = Exam.objects.filter(Q(patient_name__icontains=schword) | Q(hospital_no=schword) |
+        first_date='%s' % self.request.POST['first_date']
+        last_date = '%s' % self.request.POST['last_date']
+        #first_date = self.request.POST['first_date_year']+'-'+self.request.POST['first_date_month']+'-'+self.request.POST['first_date_day']
+        #last_date = self.request.POST['last_date_year'] + '-' + self.request.POST['last_date_month'] + '-' + self.request.POST['last_date_day']
+        if first_date =='' and last_date == '':
+            post_list = Exam.objects.filter(Q(patient_name__icontains=schword) | Q(hospital_no=schword) | Q(exam_Dx__icontains=schword) |
                                             Q(Bx_result__icontains = schword)).distinct()
             patient_number=len(post_list)
         elif first_date is not '0-0-0' and last_date is not '0-0-0':
             post_list=Exam.objects.filter((Q(exam_date__gte=first_date) & Q(exam_date__lte=last_date)) & (Q(patient_name__icontains=schword) |
-                                      Q(hospital_no=schword) | Q(Bx_result__icontains=schword))).distinct()
+                                      Q(hospital_no=schword) | Q(exam_Dx__icontains=schword) | Q(Bx_result__icontains=schword))).distinct()
             patient_number = len(post_list)
         context={}
         context['form']=form

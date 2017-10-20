@@ -2,13 +2,33 @@
 
 {% block title %}환자 검색 {% endblock %}
 
+{% load staticfiles %}
+{% block extrastyle %}
+{%endblock%}
+
 {% block content %}
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+<script>
+$(document).ready(function() {
+    $('.datepicker').datepicker({
+    dayNamesMin: [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ],
+    monthNamesShort: ['1','2','3','4','5','6','7','8','9','10','11','12'],
+    dateFormat:'yy-mm-dd',
+    changeMonth:true,
+    changeYear: true,
+    yearRange:"2016:2020",
+    });
+});
+</script>
 <div id="content">
     <h1> 검  색</h1>
 
     <form action="/procedure/search/" method="post"> {% csrf_token %}
     {{ form.as_p }}
         <input type="submit" value="찾기" />
+
     </form>
 
     <br/><br/>
