@@ -1,9 +1,9 @@
 from django import forms
 from django.forms import widgets
 from procedure.models import Exam
-from datetimewidget import widgets
+#from datetimewidget import widgets
     #.widgets import DateTimeWidget, DateWidget, TimeWidget
-from datetimewidget.widgets import DateWidget
+#from datetimewidget.widgets import DateWidget
 #from bootstrap_datepicker.widgets import DatePicker
 #from datetime import date
 
