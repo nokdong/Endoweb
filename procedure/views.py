@@ -1,5 +1,6 @@
 from datetime import date, datetime
 import collections
+import sys
 
 from django import forms
 from django.contrib.auth.decorators import login_required
@@ -548,13 +549,14 @@ def homegraph(request):
     colon_tab = Panel(child=colon, title = "대장내시경 추이")
     layout = Tabs(tabs = [egd_tab, colon_tab])
 
-    output_file('/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
-    #output_file('procedure/templates/procedure/vbar.html')
-
-    save(layout)
-    return render(request, '/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
-    #return render(request, 'procedure/vbar.html')
-
+    if sys.platform.startswith('win32'):
+        output_file('procedure/templates/procedure/vbar.html')
+        save(layout)
+        return render(request, 'procedure/vbar.html')
+    elif sys.platform.startswith('linux2'):
+        output_file('/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
+        save(layout)
+        return render(request, '/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
 
 
 '''
