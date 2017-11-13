@@ -553,7 +553,7 @@ def homegraph(request):
         output_file('procedure/templates/procedure/vbar.html')
         save(layout)
         return render(request, 'procedure/vbar.html')
-    elif sys.platform.startswith('linux2'):
+    else:
         output_file('/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
         save(layout)
         return render(request, '/home/nokdong/Endoweb/procedure/templates/procedure/vbar.html')
