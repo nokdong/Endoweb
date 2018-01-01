@@ -510,25 +510,30 @@ def homegraph(request):
 
     source = ColumnDataSource(
         data={'total_months':[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], 'egd_2015':[436, 298, 155, 110, 54, 65, 67, 51, 61, 85, 114, 185],
-                  'egd_2016':[291, 219, 102, 84, 65, 92, 73, 79, 70, 84, 123, 163], 'monthly_egd':monthly_egd,
-                  'colon_2015':[19, 12, 29, 27, 11, 4, 19, 8, 10, 15, 19, 38], 'colon_2016':[20, 23, 40, 43, 30, 35, 28, 29, 17, 21, 29, 50],
-                  'monthly_colon':monthly_colon})
+              'egd_2016':[291, 219, 102, 84, 65, 92, 73, 79, 70, 84, 123, 163],
+              'egd_2017':[220,259,160,110,107,96,98,85,84,75,111,184], 'monthly_egd':monthly_egd,
+              'colon_2015':[19, 12, 29, 27, 11, 4, 19, 8, 10, 15, 19, 38], 'colon_2016':[20, 23, 40, 43, 30, 35, 28, 29, 17, 21, 29, 50],
+              'colon_2017':[25,48,40,18,30,29,39,31,28,23,51,33],
+              'monthly_colon':monthly_colon})
 
     egd = figure(x_axis_type ='datetime', x_axis_label ='월', y_axis_label = '개수', width=1000, height=330,  tools=[], toolbar_location = "above")
     #egd.background_fill_color = 'LightCyan'
     e1=egd.vbar(x='total_months', width=0.5, bottom=0, top='monthly_egd', color='firebrick', alpha = 0.8, source=source)
     egd.add_tools(HoverTool(renderers = [e1], tooltips=[("개수", '@monthly_egd')]))
-    e2=egd.circle('total_months','egd_2016', size = 10,  color='navy', source=source)
-    egd.add_tools(HoverTool(renderers=[e2], tooltips=[("개수", '@egd_2016')]))
-    e3=egd.circle('total_months', 'egd_2015', size=10, color='DarkCyan', source=source)
-    egd.add_tools(HoverTool(renderers=[e3], tooltips=[("개수", '@egd_2015')]))
+    e2=egd.circle('total_months','egd_2017', size = 10,  color='navy', source=source)
+    egd.add_tools(HoverTool(renderers=[e2], tooltips=[("개수", '@egd_2017')]))
+    e3=egd.circle('total_months', 'egd_2016', size=10, color='DarkCyan', source=source)
+    egd.add_tools(HoverTool(renderers=[e3], tooltips=[("개수", '@egd_2016')]))
+    e4=egd.circle('total_months', 'egd_2015', size=10, color='yellow', source=source)
+    egd.add_tools(HoverTool(renderers=[e4], tooltips=[("개수", '@egd_2015')]))
 
     egd_tab = Panel(child = egd, title = "위내시경 추이")
 
     egd_legend = Legend(items = [
-        ("2017년", [e1]),
-        ("2016년", [e2]),
-        ("2015년", [e3]),], location = (0,-30))
+        ("2018년", [e1]),
+        ("2017년", [e2]),
+        ("2016년", [e3]),
+        ("2015년",[e4]),], location = (0,-30))
     egd_legend.border_line_color = 'SkyBlue'
     egd_legend.border_line_width = 3
     egd.add_layout(egd_legend, 'right')
@@ -536,12 +541,14 @@ def homegraph(request):
     colon = figure(x_axis_type ='datetime', x_axis_label ='월', y_axis_label = '개수', width = 1000, height=330, tools=[], toolbar_location = "above")
     c1=colon.vbar(x='total_months', width=0.5, bottom=0, top='monthly_colon', color='firebrick', alpha = 0.8, source=source)
     colon.add_tools(HoverTool(renderers=[c1], tooltips=[("개수", '@monthly_colon')]))
-    c2 =colon.circle('total_months','colon_2016', size = 10,  color='navy', source=source)
-    colon.add_tools(HoverTool(renderers=[c2], tooltips=[("개수", '@colon_2016')]))
-    c3 =colon.circle('total_months', 'colon_2015', size=10,  color='DarkCyan', source=source)
-    colon.add_tools(HoverTool(renderers=[c3], tooltips=[("개수", '@colon_2015')]))
+    c2 =colon.circle('total_months','colon_2017', size = 10,  color='navy', source=source)
+    colon.add_tools(HoverTool(renderers=[c2], tooltips=[("개수", '@colon_2017')]))
+    c3 =colon.circle('total_months', 'colon_2016', size=10,  color='DarkCyan', source=source)
+    colon.add_tools(HoverTool(renderers=[c3], tooltips=[("개수", '@colon_2016')]))
+    c4 = colon.circle('total_months', 'colon_2015', size=10, color='yellow', source=source)
+    colon.add_tools(HoverTool(renderers=[c4], tooltips=[("개수", '@colon_2015')]))
 
-    colon_legend = Legend(items=[("2017년", [c1]), ("2016년", [c2]), ("2015년", [c3]), ], location=(0, -30))
+    colon_legend = Legend(items=[("2018년", [c1]), ("2017년", [c2]), ("2016년", [c3]), ("2015년", [c4]), ], location=(0, -30))
     colon_legend.border_line_color = 'SkyBlue'
     colon_legend.border_line_width = 3
     colon.add_layout(colon_legend, 'right')
@@ -598,6 +605,15 @@ def home(request):
     today = date.today()
     this_month = today.month
     this_year = today.year
+
+    temp_egd={}
+    temp_colon={}
+    for month in range(1,13):
+        monthly_data = Exam.objects.filter(exam_date__year=2017).filter(exam_date__month=month)
+        temp_egd[month]=monthly_data.filter(exam_type__contains='E').count()
+        temp_colon[month]=monthly_data.filter(exam_type__contains='C').count() + monthly_data.filter(exam_type__contains='S').count()
+    print (temp_egd)
+    print (temp_colon)
 
     all_patients = Exam.objects.all()
     context = {'none_Bx': 0, 'Bx_call':0, 'none_reading': 0, 'will_phone': 0,
